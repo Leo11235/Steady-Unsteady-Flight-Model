@@ -3,7 +3,6 @@ guide for dictionaries:
     rocket_inputs refers to the user's inputs, these will never change between each simulation
     rocket_parameters refers to the parameters that get calculated in each iteration of the simulation, only the final iteration's parameters are kept
     constants_dict contains universal values such as sea level gravity
-    timestep_dict contains n-long lists, where n is the amount of timesteps; these will house information for graph creation
 '''
 
 from variable_initialization import constants_dict, read_rocket_attributes
