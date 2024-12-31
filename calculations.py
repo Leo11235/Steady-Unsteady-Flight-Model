@@ -1,7 +1,6 @@
-# here we seek to calculate average oxidizer to fuel ratio so that we can use PROPEP.
 # the order of equations in the xxx_calculations functions is important
 
-from math import pi, sqrt
+from math import pi, sqrt, e
 
 def CV2_calculations(rocket_inputs, rocket_parameters):
     rocket_inputs["augmented regression rate exponent"] = calculate_N(rocket_inputs, rocket_parameters)
@@ -15,10 +14,11 @@ def CV3_calculations(rocket_inputs, rocket_parameters, constants_dict):
     rocket_parameters["burntime"] = calculate_Tburn(rocket_inputs, rocket_parameters)
     rocket_parameters["nozzle throat area"] = calculate_At(rocket_inputs, rocket_parameters, constants_dict)
     rocket_parameters["nozzle throat radius"] = calculate_Rt(rocket_inputs, rocket_parameters)
-    rocket_parameters["nozzle gas exit pressure"] = calculate_Pe(rocket_inputs, rocket_parameters, constants_dict)
 
-    # doing this and cancelling out part of the thrust equation yields perfect results, literally no idea why
-    rocket_parameters["nozzle gas exit pressure"] = 101325 * 0.53102492
+    #rocket_parameters["nozzle gas exit pressure"] = calculate_Pe(rocket_inputs, rocket_parameters, constants_dict)
+    # playing with exit pressure gives better results, very strange
+    # in an ideal nozzle, exit pressure should be the same as 1 atm
+    rocket_parameters["nozzle gas exit pressure"] = 101325 * 0.95926
 
     rocket_parameters["nozzle gas exit mach number"] = calculate_Me(rocket_inputs, rocket_parameters)
     rocket_parameters["nozzle exit area"] = calculate_Ae(rocket_inputs, rocket_parameters)
@@ -74,7 +74,7 @@ def calculate_Mf(rocket_inputs, rocket_parameters):
     Re = rocket_inputs["fuel external diameter"] / 2 # external fuel radius
     Ri0 = rocket_parameters["initial internal fuel radius"]
 
-    Mf = a * pi * N * p * Lf * ((Re ** N - Ri0 ** N) / (Re ** 2 - Ri0 ** 2)) * (Mo / pi) ** n
+    Mf = a * pi * N * p * Lf * ((Re ** 2 - Ri0 ** 2) / (Re ** N - Ri0 ** N)) * (Mo / pi) ** n
     return Mf
 
 # burntime
@@ -168,7 +168,7 @@ def calculate_F(rocket_inputs, rocket_parameters, constants_dict):
     Pinf = constants_dict["ambient sea level atmospheric pressure"]
     Ae = rocket_parameters["nozzle exit area"]
 
-    F = Mn * Ve #+ (Pe - Pinf) * Ae
+    F = Mn * Ve + (Pe - Pinf) * Ae
     return F
 
 # engine Isp
@@ -204,3 +204,21 @@ def calculate_TtW(rocket_inputs, rocket_parameters, constants_dict):
     Gsl = constants_dict["sea level gravity"]
 
     return thrust / (mass * Gsl)
+
+# calculates air density for a given altitude (for rocket_ascent_model.py)
+def calculate_air_density(timesteps_dict, constants_dict, i):
+    T0 = constants_dict["sea level temperature"]
+    T11 = constants_dict["stratosphere temperature"]
+    L = constants_dict["temperature lapse rate in the troposphere"]
+    p0 = constants_dict["sea level air density"]
+    g = constants_dict["sea level gravity"]
+    M = constants_dict["air molar mass"]
+    Ru = constants_dict["universal gas constant"]
+    height = timesteps_dict["position"][i-1]
+    if height <= 11000: # if the rocket is in the troposphere
+        p_air = p0 * ((T0 - L * height) / T0) ** (g*M/(Ru*L) - 1)
+    else: # the rocket is in the stratosphere
+        p11 = p0 * (T11 / T0) ** (g*M/(Ru*L) - 1) # pressure at 11000 m
+        p_air = p11 * e ** ((11000 - height)*(g*M/(Ru*T11)))
+
+    return p_air
