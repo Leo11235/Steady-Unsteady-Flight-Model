@@ -44,12 +44,19 @@ required_keys = [
 # may end up adding lots of random stuff here
 constants_dict = {
     # natural constants
-    "universal gas constant": 8.31446261815324, # J / (mol * K)
     "sea level gravity": 9.80665, # m/s^2
+    "universal gas constant": 8.31446261815324, # J / (mol * K)
     "ambient sea level atmospheric pressure": 101325,  # Pa 
+    "earth radius": 6378000, # m
+    "sea level air density": 1.225, # kg/m^3
+    "sea level temperature": 288.15, # K
+    "stratosphere temperature": 216.65, # K
+    "air molar mass": 0.0289644, # kg/mol
+    "temperature lapse rate in the troposphere": 0.0065, # K/m
 
     # for computation purposes
-    "number of timesteps": 100,
+    "number of timesteps": 100, # number of timesteps in burntime (only accounts for the part of the burn where there is a thrust). Ascent timesteps typically 300-400
+    "tolerated apogee difference": 1, # m, allowed space between target and real apogee
 }
 
 # main function of this class, takes input file, outputs a dictionary rocket_inputs
