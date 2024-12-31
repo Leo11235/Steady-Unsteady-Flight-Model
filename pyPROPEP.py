@@ -1,6 +1,3 @@
-# no clue if this works lol
-
-
 import pypropep as ppp
 
 # takes dictionaries, extracts relevant information, returns
