@@ -20,6 +20,14 @@ def main():
     # iterate over fuel inner radius to eventually reach the right apogee
     rocket_parameters, overall_flight_dict = iterate_over_fuel_mass(rocket_inputs, constants_dict)
 
+    # at this point, rocket_inputs and rocket_parameters contain all the information we need about the rocket, 
+    # and overall_flight_dict contains info that can be used to graph forces and kinematics
+
+# still need to implement:
+    # parametric studies
+    # put relevant results in a JSON file
+
+
     
     # DEBUGGING 
     graph_everything(overall_flight_dict)
@@ -28,17 +36,6 @@ def main():
     #print_dict(timesteps_dict)
     #print_dict(ascent_dict)
 
-
-    # altitude convergence (iteration)
-        # set bounds for initial internal fuel radius
-        # calculations part 1
-        # PROPEP
-        # calculations part 2
-        # time functions (more calculations)
-    
-    # parametric studies
-
-    # put relevant results in a JSON file
 
 
 # ITERATION
@@ -60,7 +57,7 @@ def iterate_over_fuel_mass(rocket_inputs, constants_dict):
         rocket_parameters = { "initial internal fuel radius": Ri0 }        
         # step 1
         calculations.CV2_calculations(rocket_inputs, rocket_parameters) # run CV2 with this r
-        # step 2
+        # step 2: propep
         runPROPEP(rocket_inputs, rocket_parameters)
         # step 3
         calculations.CV3_calculations(rocket_inputs, rocket_parameters, constants_dict)
@@ -74,11 +71,22 @@ def iterate_over_fuel_mass(rocket_inputs, constants_dict):
         elif rocket_parameters["reached apogee"] < rocket_inputs["target apogee"]:
             upper_bound = Ri0 # & vice versa
         Ri0 = (upper_bound + lower_bound) / 2
+        # quick check to make sure the inner fuel radius is not too small (& therefore the rocket has no hope of ever reaching apogee)
+        if rocket_parameters["initial internal fuel radius"] < constants_dict["smallest allowed inner fuel radius"]:
+            erocketyle_dysfunction() # exits the program
         i += 1
-    
     return rocket_parameters, overall_flight_dict
 
 
+# for when the rocket just can't make it :(
+def erocketyle_dysfunction():
+    print(
+        "Rocket simulation halted: The rocket's parameters are unrealistic. "
+        "The initial internal fuel radius has converged to a value smaller than the allowed minimum, "
+        "indicating the rocket cannot reach the target apogee with the current setup."
+    )
+    # finish
+    exit(0)
 
 
 # prints all items of a dictionary in a nice way
