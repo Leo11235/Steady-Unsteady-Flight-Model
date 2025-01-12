@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steady State Loading</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .section pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 5px;
+        }
+        .chart-container {
+            margin-top: 20px;
+        }
+        .chart {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .chart img {
+            max-width: 100%;
+            height: auto;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    {% if error_details %}
+        <div class="section" id="errors">
+            <h1>Error</h1>
+            <ul>
+                {% for error_type, error_message in error_details.items() %}
+                    {% if loop.index > 1 %} <!-- Skip the first error -->
+                        <li><h2>{{ error_type.capitalize() }}</h2>
+                            <p style="font-size: 16px;">{{ error_message }}</p></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if rocket_inputs %}
+        <div class="section" id="rocket-inputs">
+            <h1>Rocket Inputs</h1>
+            <pre>
+{% set max_key_length = rocket_inputs.keys()|map('length')|max %}
+{% for key, value in rocket_inputs.items() %}{{ key }} {{ "." * (max_key_length - key|length + 2) }} {{ value }}
+{% endfor %}
+            </pre>
+        </div>
+    {% endif %}
+
+    {% if iteration_data %}
+        <div class="section" id="iteration-data">
+            <h1>Iteration Data</h1>
+            <ul>
+                {% for iteration, description in iteration_data.items() %}
+                    <li><strong>{{ iteration }}</strong>: {{ description }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if rocket_parameters %}
+        <div class="section" id="rocket-parameters">
+            <h1>Rocket Parameters</h1>
+            <pre>
+{% set max_key_length = rocket_parameters.keys()|map('length')|max %}
+{% for key, value in rocket_parameters.items() %}{{ key }} {{ "." * (max_key_length - key|length + 2) }} {{ value }}
+{% endfor %}
+            </pre>
+        </div>
+    {% endif %}
+
+    <div class="chart-container">
+        {% if overall_flight_dict %}
+            <div class="chart" id="forces-chart">
+                <h2>Forces Over Time</h2>
+                <img src="/plot/forces" alt="Forces Over Time">
+            </div>
+            <div class="chart" id="acceleration-chart">
+                <h2>Acceleration Over Time</h2>
+                <img src="/plot/acceleration" alt="Acceleration Over Time">
+            </div>
+            <div class="chart" id="velocity-chart">
+                <h2>Velocity Over Time</h2>
+                <img src="/plot/velocity" alt="Velocity Over Time">
+            </div>
+            <div class="chart" id="position-chart">
+                <h2>Position Over Time</h2>
+                <img src="/plot/position" alt="Position Over Time">
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="button-container">
+        <form action="/" method="get">
+            <button type="submit">Back to Home</button>
+        </form>
+    </div>
+
+    <div class="button-container">
+        <form action="/" method="get">
+            <button type="submit">Parametric Study</button>
+        </form>
+    </div>
+
+</body>
+</html>
