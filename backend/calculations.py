@@ -1,4 +1,4 @@
-# the order of equations in the xxx_calculations functions is important
+# perform calculations used in the rest of the simulation
 
 from math import pi, sqrt, e
 
