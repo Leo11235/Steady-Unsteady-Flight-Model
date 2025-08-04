@@ -10,7 +10,7 @@ def runPROPEP(rocket_inputs, rocket_parameters):
     chamber_pressure = rocket_inputs["chamber pressure"] / 101325 # convert from pascal to atm
 
     # calculations
-    ppp.init() # necessary to initialize pypropep
+    ppp.init() # initialize pypropep
 
     # make sure everything matches nicely, otherwise everything is fucked
     try:
@@ -45,4 +45,4 @@ def runPROPEP(rocket_inputs, rocket_parameters):
         rocket_parameters["heat capacity ratio"] = heat_ratio
 
     except Exception as e:
-        return {"error": f"Error extracting properties: {e}"}
+        return {"error": f"pyPROPEP - Error extracting properties: {e}"}

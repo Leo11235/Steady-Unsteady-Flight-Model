@@ -2,15 +2,16 @@
 
 from math import pi, sqrt, e
 
-def CV2_calculations(rocket_inputs, rocket_parameters):
+def CV2_calculations(rocket_inputs, rocket_parameters): # control volume 2 = combustion chamber
     rocket_inputs["augmented regression rate exponent"] = calculate_N(rocket_inputs, rocket_parameters)
     rocket_parameters["average oxidizer to fuel ratio"] = calculate_OF(rocket_inputs, rocket_parameters)
     rocket_parameters["fuel mass"] = calculate_fuel_mass(rocket_inputs, rocket_parameters)
 
 # PROPEP calculations fall here
 
-def CV3_calculations(rocket_inputs, rocket_parameters, constants_dict):
+def CV3_calculations(rocket_inputs, rocket_parameters, constants_dict): # CV3 = nozzle
     rocket_parameters["average fuel mass flow rate"] = calculate_Mf(rocket_inputs, rocket_parameters)
+    rocket_parameters["total propellant mass flow rate"] = rocket_inputs["oxidizer mass flow rate"] + rocket_parameters["average fuel mass flow rate"]
     rocket_parameters["burntime"] = calculate_Tburn(rocket_inputs, rocket_parameters)
     rocket_parameters["nozzle throat area"] = calculate_At(rocket_inputs, rocket_parameters, constants_dict)
     rocket_parameters["nozzle throat radius"] = calculate_Rt(rocket_inputs, rocket_parameters)
@@ -49,7 +50,7 @@ def calculate_OF(rocket_inputs, rocket_parameters):
     N = rocket_inputs["augmented regression rate exponent"]
     p = rocket_inputs["fuel grain density"]
     Lf = rocket_inputs["fuel length"]
-    Re = rocket_inputs["fuel external diameter"] / 2 # external fuel radius
+    Re = rocket_inputs["fuel external radius"]
     Ri0 = rocket_parameters["initial internal fuel radius"]
     
     OF = (1 / (a * N * p * Lf)) * (Mo / pi) ** (1 - n) * ((Re ** N - Ri0 ** N) / (Re ** 2 - Ri0 ** 2))
@@ -58,7 +59,7 @@ def calculate_OF(rocket_inputs, rocket_parameters):
 def calculate_fuel_mass(rocket_inputs, rocket_parameters):
     Lf = rocket_inputs["fuel length"]
     Ri0 = rocket_parameters["initial internal fuel radius"]
-    Re = rocket_inputs["fuel external diameter"] / 2 # external fuel radius
+    Re = rocket_inputs["fuel external radius"] 
     p = rocket_inputs["fuel grain density"]
 
     return pi * Lf * (Re ** 2 - Ri0 ** 2) * p
@@ -71,7 +72,7 @@ def calculate_Mf(rocket_inputs, rocket_parameters):
     N = rocket_inputs["augmented regression rate exponent"]
     p = rocket_inputs["fuel grain density"]
     Lf = rocket_inputs["fuel length"]
-    Re = rocket_inputs["fuel external diameter"] / 2 # external fuel radius
+    Re = rocket_inputs["fuel external radius"] 
     Ri0 = rocket_parameters["initial internal fuel radius"]
 
     Mf = a * pi * N * p * Lf * ((Re ** 2 - Ri0 ** 2) / (Re ** N - Ri0 ** N)) * (Mo / pi) ** n
@@ -83,7 +84,7 @@ def calculate_Tburn(rocket_inputs, rocket_parameters):
     a = rocket_inputs["regression rate scaling coefficient"]
     n = rocket_inputs["regression rate exponent"]
     N = rocket_inputs["augmented regression rate exponent"]
-    Re = rocket_inputs["fuel external diameter"] / 2 # external fuel radius
+    Re = rocket_inputs["fuel external radius"]
     Ri0 = rocket_parameters["initial internal fuel radius"]
 
     Tburn = (1 / (a * N * (Mo / pi) ** n)) * (Re ** N - Ri0 ** N)
@@ -206,7 +207,7 @@ def calculate_TtW(rocket_inputs, rocket_parameters, constants_dict):
     return thrust / (mass * Gsl)
 
 # calculates air density for a given altitude (for rocket_ascent_model.py)
-def calculate_air_density(timesteps_dict, constants_dict, i):
+def calculate_air_density(constants_dict, height):
     T0 = constants_dict["sea level temperature"]
     T11 = constants_dict["stratosphere temperature"]
     L = constants_dict["temperature lapse rate in the troposphere"]
@@ -214,7 +215,6 @@ def calculate_air_density(timesteps_dict, constants_dict, i):
     g = constants_dict["sea level gravity"]
     M = constants_dict["air molar mass"]
     Ru = constants_dict["universal gas constant"]
-    height = timesteps_dict["position"][i-1]
     if height <= 11000: # if the rocket is in the troposphere
         p_air = p0 * ((T0 - L * height) / T0) ** (g*M/(Ru*L) - 1)
     else: # the rocket is in the stratosphere
@@ -222,3 +222,8 @@ def calculate_air_density(timesteps_dict, constants_dict, i):
         p_air = p11 * e ** ((11000 - height)*(g*M/(Ru*T11)))
 
     return p_air
+
+# calculate gravity as a function of height
+def calculate_gravity(constants_dict, height):
+    R = constants_dict["earth radius"]
+    return constants_dict["sea level gravity"] * (R+height)/R
