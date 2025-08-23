@@ -6,7 +6,7 @@
         "debug comments": "detailed comments", 
         "output units": "SI", // SI, IMP, or MRT (rocket team's own mishmash of SI and IMP)
         "show output graphs": true, // whether to show graphs once the simulation is done computing
-        "same simulation data": true, // whether to save simulation data
+        "save simulation data": true, // whether to save simulation data
         "parametric study settings": {
             "oxidizer mass flow rate": {
                 "low end": 1,

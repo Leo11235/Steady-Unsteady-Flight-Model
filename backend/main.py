@@ -9,6 +9,8 @@ guide for dictionaries:
 
 from variable_initialization import simulation_settings_dict, read_input_file
 from simulation_iterations import iterate_over_fuel_mass, simulate_rocket_burn
+import parametric_study
+import json
 
 def main(input_file_path):
     # create dictionaries of rocket inputs, simulation settings
@@ -33,30 +35,13 @@ def main(input_file_path):
     
     # parametric study
     elif simulation_settings_dict["simulation type"].lower() == "parametric study": # runs many fuel mass convergences
-        print(generate_parametric_study_description())
-        return
+        print(parametric_study.generate_parametric_study_description(simulation_settings_dict))
+        return parametric_study.run_paramatric_study(rocket_inputs, simulation_settings_dict)
+        
     
     # optimize values for unsteady
     elif simulation_settings_dict["simulation type"].lower() == "optimize values for unsteady": # optimizes Isp as a function of Mo, Lf, Re for use by unsteady -- basically a specific parametric study
         return
-
-
-def generate_parametric_study_description():
-    # construct a phrase for each parameter
-    phrases = []
-    for key, value in simulation_settings_dict["parametric study settings"].items():
-        phrase = f"\n   {key} (low end: {value['low end']}, high end: {value['high end']}, step size: {value['step size']})"
-        phrases.append(phrase)
-    
-    # join with commas and 'and' before the last item
-    if len(phrases) == 1:
-        summary = phrases[0]
-    elif len(phrases) == 2:
-        summary = " and ".join(phrases)
-    else:
-        summary = ", ".join(phrases[:-1]) + ", and " + phrases[-1]
-    
-    return f"Running parametric study on {summary}"
     
 
 # prints all items of a dictionary in a nice way
@@ -68,5 +53,21 @@ def print_dict(input_dictionary):
     print()
 
 if __name__ == '__main__':
+    # get file and run simulation
     file = "./input_files/Esteban's_Ancalagon_param_1.jsonc"
-    main(file)
+    data = main(file)
+    
+    # save data
+    if simulation_settings_dict["save simulation data"]:
+        with open("output_files/simulation_output.json", "w") as f:
+            json.dump(data, f, indent=4)
+            
+    # graph data
+    
+    # estimate 'file size' of data
+    json_str = json.dumps(data)
+    size_bytes = len(json_str.encode('utf-8'))
+    size_kb = size_bytes / 1024
+    size_mb = size_kb / 1024
+    print(f"Estimated JSON size: {size_bytes} bytes ({size_kb:.2f} KB / {size_mb:.2f} MB)")
+
