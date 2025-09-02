@@ -1,7 +1,7 @@
-from variable_initialization import simulation_settings_dict, constants_dict
-import calculations
+from backend.steady_variable_initialization import simulation_settings_dict, constants_dict
+import backend.steady_calculations as steady_calculations
 from pyPROPEP import runPROPEP
-from rocket_ascent_simulator import simulate_rocket_ascent
+from backend.steady_rocket_ascent_simulator import simulate_rocket_ascent
 
 # converges on an ideal fuel mass given a target apogee; returns rocket_inputs, rocket_parameters, flight_dict
 def iterate_over_fuel_mass(rocket_inputs):
@@ -24,13 +24,13 @@ def iterate_over_fuel_mass(rocket_inputs):
         rocket_parameters["reached apogee"] = flight_dict["altitude"][-1]
         if correct_apogee_reached(rocket_inputs, rocket_parameters):
             print(f'    LOOP {i} - FINAL APOGEE: {round(rocket_parameters["reached apogee"], 1)} meters ({round(abs(rocket_parameters["reached apogee"] - rocket_inputs["target apogee"]), 5)} meters off from target)') if "detailed comments" in simulation_settings_dict["debug comments"] else None
-            return rocket_parameters, flight_dict
+            return {"rocket parameters": rocket_parameters, "flight dict": flight_dict}
         else: 
             # check if rocket failed to reach apogee even with lowest allowed internal fuel radius
             if rocket_parameters["initial internal fuel radius"] == constants_dict["smallest allowed inner fuel radius"]: # AND not reached apogee, but that possibility has already been filtered out
                 # if the code makes it to here, the rocket cannot reach the target apogee
                 print(f"    ROCKET CANNOT REACH APOGEE (final apogee reached: {rocket_parameters["reached apogee"]} meters)")
-                return rocket_parameters, flight_dict
+                return {"rocket parameters": rocket_parameters, "flight dict": flight_dict}
             # refine inner fuel radius guess and try again
             if rocket_parameters["reached apogee"] > rocket_inputs["target apogee"]:
                 lower_bound = rocket_parameters["initial internal fuel radius"] # if the rocket flies too high, increase inner radius (less fuel)
@@ -61,10 +61,10 @@ def correct_apogee_reached(rocket_inputs, rocket_parameters):
 # takes rocket input data, outputs rocket performance becnhmarks
 def simulate_rocket_burn(rocket_inputs, rocket_parameters):
     # step 1
-    calculations.CV2_calculations(rocket_inputs, rocket_parameters)
+    steady_calculations.CV2_calculations(rocket_inputs, rocket_parameters)
     # step 2: propep
     runPROPEP(rocket_inputs, rocket_parameters)
     # step 3
-    calculations.CV3_calculations(rocket_inputs, rocket_parameters, constants_dict)
+    steady_calculations.CV3_calculations(rocket_inputs, rocket_parameters, constants_dict)
     # output
     return rocket_parameters

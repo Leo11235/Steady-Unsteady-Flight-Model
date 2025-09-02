@@ -1,6 +1,6 @@
 import itertools, numpy as np
-import simulation_iterations
-from variable_initialization import constants_dict
+import backend.steady_simulation_iterations as steady_simulation_iterations
+from backend.steady_variable_initialization import constants_dict
 
 # runs parametric study, works for n inputs
 def run_paramatric_study(rocket_inputs, simulation_settings_dict):
@@ -35,7 +35,7 @@ def run_paramatric_study(rocket_inputs, simulation_settings_dict):
             current_rocket_inputs[var] = val
         # run simulation
         print(f'{round(100*i/total_iterations, 1)}% -- Loop {i} {combination}') if "comments" in simulation_settings_dict["debug comments"] else None
-        rocket_parameters, flight_dict = simulation_iterations.iterate_over_fuel_mass(current_rocket_inputs)
+        rocket_parameters, flight_dict = steady_simulation_iterations.iterate_over_fuel_mass(current_rocket_inputs)
         # save results
         param_results_dict["rocket inputs"].append(current_rocket_inputs)
         param_results_dict["rocket parameters"].append(rocket_parameters)

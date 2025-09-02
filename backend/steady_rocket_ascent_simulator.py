@@ -1,4 +1,4 @@
-from calculations import calculate_air_density, calculate_gravity
+from backend.steady_calculations import calculate_air_density, calculate_gravity
 from math import pi, cos, radians
 
 # takes as input details about the rocket, outputs a dict with flight information
