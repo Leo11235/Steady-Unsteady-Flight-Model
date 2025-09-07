@@ -1,7 +1,7 @@
-from backend.steady_variable_initialization import simulation_settings_dict, constants_dict
-import backend.steady_calculations as steady_calculations
+from steady_variable_initialization import simulation_settings_dict, constants_dict
+import steady_calculations as steady_calculations
 from pyPROPEP import runPROPEP
-from backend.steady_rocket_ascent_simulator import simulate_rocket_ascent
+from steady_rocket_ascent_simulator import simulate_rocket_ascent
 
 # converges on an ideal fuel mass given a target apogee; returns rocket_inputs, rocket_parameters, flight_dict
 def iterate_over_fuel_mass(rocket_inputs):

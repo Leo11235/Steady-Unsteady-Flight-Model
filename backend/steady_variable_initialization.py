@@ -1,8 +1,3 @@
-'''
-this class handless the input file and format is in a way
-that is nice to use for the rest of the program
-'''
-
 import json, re
 
 simulation_settings_dict = {

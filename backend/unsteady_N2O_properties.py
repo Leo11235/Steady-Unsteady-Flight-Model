@@ -20,6 +20,16 @@ def get_N2O_property(tank_temp, property_name, N2O_properties_dict):
     if tank_temp < 183 or tank_temp > 309:
         raise ValueError("Tank temperature out of valid range (183 K to 309 K)")
     
+    # some variables have functions rather than relying on the lookup table
+    if property_name == 'p':
+        return p_sat(tank_temp) # saturated pressure of N2O
+    elif property_name == 'd_p/d_T':
+        return dp_sat_dT(tank_temp) # saturated pressure of N2O with respect to tank temp
+    elif property_name == 'v_l':
+        return v_l_sat(tank_temp) # saturated liquid molar volume of nitrous
+    elif property_name == 'd_v_l/d_T':
+        return dv_l_sat_dT(tank_temp) # saturated liquid molar volume of nitrous with respect to tank temp
+    
     T_list = N2O_properties_dict['T']
     
     # for given tank_temp, find the two 'neighboring' points

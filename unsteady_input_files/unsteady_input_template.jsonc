@@ -15,9 +15,9 @@
     "dip tube internal diameter": "", // d_dt
     "dip tube length": "", // L_dt
     "tank internal diameter": "", // d_T
-    "tank initial temperature": "220", // T_T_0, [K]
+    "tank initial temperature": "", // T_T_0
     // ONE of the following:
-    "tank ullage factor": "0.5", // U 
+    "tank ullage factor": "", // U 
     "tank internal length": "", // L_T
 
     "oxidizer liquid volume": "", // V_l

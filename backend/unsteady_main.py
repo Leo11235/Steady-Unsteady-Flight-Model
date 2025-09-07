@@ -1,4 +1,4 @@
-import unsteady_N2O_properties
+import unsteady_N2O_properties, unsteady_variable_initialization
 
 state_vector = {
     'time': [],
@@ -17,24 +17,19 @@ state_vector = {
     'a_R': [], # vertical acceleration
 }
 
-# initialize state vector using either ullage factor or tank internal length as an input
-def initialize_state_vector(rocket_inputs):
-    m_o_tot = rocket_inputs["oxidizer total mass in propulsion system"]
-    W_o = rocket_inputs["oxidizer molar weight"]
-    U = rocket_inputs["tank ullage factor"]
-    d_T = rocket_inputs["tank internal diameter"]
-    D_dt = rocket_inputs["dip tube external diameter"]
-    d_dt = rocket_inputs["dip tube internal diameter"]
-    
-    v_v = rocket_inputs["moles of N2O in vapor phase the tank"]
-    v_l = rocket_inputs["moles of N2O in liquid phase the tank"]
-    return
 
+def main(input_file):
+    # initialize rocket inputs file
+    rocket_inputs = unsteady_variable_initialization.read_input_file(input_file) # returns rocket_inputs dict
+    # initialize N2O properties dict only once for the whole program
+    N2O_properties_dict = unsteady_N2O_properties.initialize_N2O_properties_dict()
+    # initialize state vector (calculate t=0 value for all variables)
+    unsteady_variable_initialization.initialize_state_vector(rocket_inputs, N2O_properties_dict)
+    
 
 
 if __name__ == '__main__':
-    # initialize N2O properties dict only once for the whole program
-    N2O_properties_dict = unsteady_N2O_properties.initialize_N2O_properties_dict()
+    # get file and run simulation
+    file = "./unsteady_input_files/unsteady_input_1.jsonc"
+    data = main(file)
     
-    p = unsteady_N2O_properties.get_N2O_property(186, 'v_v', N2O_properties_dict)
-    print(p)
