@@ -1,0 +1,26 @@
+{
+    "rocket name": "Ancalagon 2",
+    "planet": "Earth",
+
+    "target apogee": [45000, "IMP"],
+    "oxidizer mass flow rate": [4.7, "SI"],
+    "chamber pressure": [600, "IMP"], 
+    "fuel external diameter": [6, "IMP"],
+    "fuel length": [24, "IMP"],
+
+    "launch site altitude": [1194, "IMP"],
+    "dry mass": [88.89, "SI"],
+    "rocket external diameter": [8.1, "IMP"],
+    "fuel grain density": [900, "SI"],
+
+    "liquid oxidizer type": "NITROUS OXIDE",
+    "solid fuel type": "EICOSANE (PARAFFIN)",
+    "launch angle": 6,
+    "drag coefficient": 0.641606,
+    "regression rate exponent": 0.555,
+    "regression rate scaling coefficient": 0.000132,
+
+    "prop dry mass":0,
+    "prop diameter":0,
+    "prop length":0
+}

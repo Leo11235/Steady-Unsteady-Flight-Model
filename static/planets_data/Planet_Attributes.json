@@ -1,0 +1,145 @@
+{
+    "Earth": {
+        "atmosphere": true,
+        "sea level gravity": 9.80665,
+        "sea level air density": 1.225,
+        "sea level temperature": 288.15,
+        "ambient sea level atmospheric pressure": 101325,
+        "air molar mass": 0.0289652,
+        "troposphere temperature lapse rate": 0.0065,
+        "stratosphere temperature": 216.65,
+        "planet radius": 6378000
+    },
+    "Moon": {
+        "atmosphere": false,
+        "sea level gravity": 1.622,
+        "planet radius": 1737100
+    },
+    "Mercury": {
+        "atmosphere": false,
+        "sea level gravity": 3.7,
+        "planet radius": 2439700
+    },
+    "Venus": {
+        "atmosphere": true,
+        "sea level gravity": 8.87,
+        "sea level air density": 65.0,
+        "sea level temperature": 737.0,
+        "air molar mass": 0.04334,
+        "planet radius": 6051800
+    },
+    "Mars": {
+        "atmosphere": true,
+        "sea level gravity": 3.72076,
+        "sea level air density": 0.020,
+        "sea level temperature": 208.15,
+        "air molar mass": 0.04334,
+        "planet radius": 3389500
+    },
+    "Jupiter": {
+        "atmosphere": true,
+        "sea level gravity": 24.79,
+        "sea level air density": 0.16,
+        "sea level temperature": 165,
+        "air molar mass": 0.00202,
+        "planet radius": 69911000
+    },
+    "Saturn": {
+        "atmosphere": true,
+        "sea level gravity": 10.44,
+        "sea level air density": 0.19,
+        "sea level temperature": 134,
+        "air molar mass": 0.00202,
+        "planet radius": 58232000
+    },
+    "Uranus": {
+        "atmosphere": true,
+        "sea level gravity": 8.87,
+        "sea level air density": 0.42,
+        "sea level temperature": 76,
+        "air molar mass": 0.00202,
+        "planet radius": 25362000
+    },
+    "Neptune": {
+        "atmosphere": true,
+        "sea level gravity": 11.15,
+        "sea level air density": 0.45,
+        "sea level temperature": 72,
+        "air molar mass": 0.00202,
+        "planet radius": 24622000
+    },
+    "Pluto": {
+        "atmosphere": true,
+        "sea level gravity": 0.62,
+        "sea level air density": 0.00001,
+        "sea level temperature": 44,
+        "air molar mass": 0.028,
+        "planet radius": 1188000
+    },
+
+    "--STARS--":{},
+    "Sun": {
+        "atmosphere": true,
+        "sea level gravity": 274,
+        "sea level air density": 1e-6,
+        "sea level temperature": 5778,
+        "air molar mass": 0.001,
+        "planet radius": 695700000
+    },
+
+    "--MOONS--":{},
+    "Europa": {
+        "atmosphere": true,
+        "sea level gravity": 1.315,
+        "sea level air density": 1e-9,
+        "sea level temperature": 102.0,
+        "air molar mass": 0.032,
+        "planet radius": 1560800
+    },
+    "Titan": {
+        "atmosphere": true,
+        "sea level gravity": 1.352,
+        "sea level air density": 5.3,
+        "sea level temperature": 94,
+        "air molar mass": 0.028,
+        "planet radius": 2574700
+    },
+
+    "--EXOPLANETS--":{},
+    "Kepler-22b": {
+        "atmosphere": true,
+        "sea level gravity": 19.62,
+        "sea level air density": 2.0,
+        "sea level temperature": 295.0,
+        "air molar mass": 0.030,
+        "planet radius": 14900000
+    },
+
+    "--FICTIONAL WORLDS--":{},
+    "Arrakis": {
+        "atmosphere": true,
+        "sea level gravity": 10.1,
+        "sea level air density": 0.8,
+        "sea level temperature": 340,
+        "air molar mass": 0.02896,
+        "planet radius": 6000000
+    },
+    "B612 (The Little Prince)": {
+        "atmosphere": false,
+        "sea level gravity": 1,
+        "planet radius": 12
+    },
+    "Death Star": {
+        "atmosphere": false,
+        "sea level gravity": 0.7,
+        "planet radius": 160000
+    },
+    "Kerbin": {
+        "atmosphere": true,
+        "sea level gravity": 9.8,
+        "sea level air density": 1.5,
+        "sea level temperature": 290,
+        "air molar mass": 0.02896,
+        "planet radius": 600000
+    }
+}
