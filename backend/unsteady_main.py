@@ -10,21 +10,22 @@ state_vector = {
     'r_f': [], # fuel grain port internal radius
     'm_o': [], # oxidizer mass in the combustion chamber
     'm_f': [], # fuel mass in the combustion chamber
-    'p_c': [], # combustion chamber pressure
+    'p_C': [], # combustion chamber pressure
     # CV4: entire rocket (might split into horizontal and vertical components)
     'z_R': [], # rocket altitude
     'v_R': [], # rocket total velocity
     'a_R': [], # vertical acceleration
 }
 
-
+# whole program is run from here
 def main(input_file):
     # initialize rocket inputs file
     rocket_inputs = unsteady_variable_initialization.read_input_file(input_file) # returns rocket_inputs dict
     # initialize N2O properties dict only once for the whole program
     N2O_properties_dict = unsteady_N2O_properties.initialize_N2O_properties_dict()
-    # initialize state vector (calculate t=0 value for all variables)
-    unsteady_variable_initialization.initialize_state_vector(rocket_inputs, N2O_properties_dict)
+    # initialize state vector (calculate value of all variables at t=0)
+    x_0 = unsteady_variable_initialization.initialize_state_vector(rocket_inputs, N2O_properties_dict)
+    print(x_0)
     
 
 

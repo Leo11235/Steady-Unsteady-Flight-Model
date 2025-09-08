@@ -2,23 +2,32 @@
   "rocket attributes": {
     "rocket name": "",
     "target apogee": "",
-    "launch site altitude": "",
     "dry mass": "",
     "rocket external diameter": "",
     "drag coefficient": "",
     "launch angle degrees": "",
 
-    // state vector init
-    "oxidizer total mass in propulsion system": "", // m_o_tot
-    "oxidizer molar weight": "", // W_o
-    "dip tube external diameter": "", // D_dt
-    "dip tube internal diameter": "", // d_dt
-    "dip tube length": "", // L_dt
-    "tank internal diameter": "", // d_T
-    "tank initial temperature": "220", // T_T_0, [K]
+    // state vector init: tank
+    "oxidizer total initial mass": 4, // m_o_tot [kg]
+    "oxidizer molar mass": 0.044013, // W_o [kg/mol]
+    "dip tube external diameter": 0.02, // D_dt [m]
+    "dip tube internal diameter": 0.015, // d_dt [m]
+    "tank internal diameter": 0.2, // d_T [m]
+    "tank initial temperature": 220, // T_T, [K]
     // ONE of the following:
-    "tank ullage factor": "0.5", // U 
+    "tank ullage factor": 0.5, // U 
     "tank internal length": "", // L_T
+
+    // state vector init: combustion chamber
+    "total initial fuel mass": 2, // m_f_tot [kg]
+    "fuel length": 0.2, // L_f [m]
+    "fuel external radius": 0.1, // R_f [m]
+    "fuel density": 900, // p_f [kg/m^3]
+
+    // state vector init: rocket body
+  "launch site altitude": 360, // z_R [m]
+
+
 
     "oxidizer liquid volume": "", // V_l
     "oxidizer vapor volume": "", // V_V
