@@ -94,5 +94,7 @@ def initialize_state_vector_using_ullage(rocket_inputs, T_T_0, v_l, v_v, p_0):
         [-4/math.pi,0,0,d_T**2,-d_T**2]
     ])
     b = numpy.array([m_o_tot_0/W_o,0,0,0,0])
-    V_l, n_l, n_v, L_T, L_dt = numpy.linalg.solve(A, b)    
+    
+    V_l, n_l, n_v, L_T, L_dt = numpy.linalg.solve(A, b)
+    
     return V_l, n_l, n_v, L_T, L_dt
