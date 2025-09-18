@@ -61,7 +61,7 @@ def initialize_state_vector(rocket_inputs, N2O_properties_dict):
     r_f = math.sqrt(R_f**2 - m_f_tot/(math.pi*p_f*L_f))
     m_f = 0 # fuel in the chamber
     m_o = 0 # oxidizer in the chamber
-    p_C = 11111111111111111111111111111 # initial chamber pressure to be calculated as a function of initial rocket height
+    p_C = 11111111111111111111111111111 # initial chamber pressure to be calculated as a function of initial rocket height # what am I smoking it should be an input
     
     # INITIALIZE CV4: rocket (body) variables
     z_R = rocket_inputs["launch site altitude"]
@@ -73,6 +73,7 @@ def initialize_state_vector(rocket_inputs, N2O_properties_dict):
 
 # uses tank length to initialize the state vector, returns state vector at t=0
 def initialize_state_vector_using_tank_length(rocket_inputs, T_T_0, v_l, v_v, p_0):
+    # not yet done but will use the same logic as initialize_state_vector_using_ullage()
     return
 
 # uses tank ullage factor to initialize the state vector, returns state vector at t=0
@@ -96,5 +97,7 @@ def initialize_state_vector_using_ullage(rocket_inputs, T_T_0, v_l, v_v, p_0):
     b = numpy.array([m_o_tot_0/W_o,0,0,0,0])
     
     V_l, n_l, n_v, L_T, L_dt = numpy.linalg.solve(A, b)
+    
+    print(V_l, n_l, n_v, L_T, L_dt)
     
     return V_l, n_l, n_v, L_T, L_dt
