@@ -26,7 +26,7 @@ def read_input_file(input_file):
 # returns a dict of natural constants used throughout the simulation. 
 def initialize_natural_constants_dict():
     # find and open file
-    file = "./data/natual_constants.jsonc"
+    file = "./data/natural_constants.jsonc"
     with open(file, 'r') as f:
         content = f.read()
     # remove comments
@@ -42,9 +42,9 @@ def initialize_state_vector(rocket_inputs, N2O_properties_dict, constants_dict):
     # INITIALIZE CV1: tank state variables
     # initialize saturated N2O properties
     T_T_0 = rocket_inputs['tank initial temperature']
-    v_l = get_N2O_property(T_T_0, 'v_l', N2O_properties_dict) # v_l = liquid molar volume at T_T_0
-    v_v = get_N2O_property(T_T_0, 'v_v', N2O_properties_dict) # v_v = vapor molar volume at T_T_0
-    p_0 = get_N2O_property(T_T_0, 'p', N2O_properties_dict) # pressure?
+    v_l = get_N2O_property('v_l', T_T_0, N2O_properties_dict) # v_l = liquid molar volume at T_T_0
+    v_v = get_N2O_property('v_v', T_T_0, N2O_properties_dict) # v_v = vapor molar volume at T_T_0
+    p_0 = get_N2O_property('p', T_T_0, N2O_properties_dict) # pressure?
     # unpack some rocket parameters
     m_o_tot_0 = rocket_inputs["oxidizer total initial mass"]
     W_o = rocket_inputs["oxidizer molar mass"]

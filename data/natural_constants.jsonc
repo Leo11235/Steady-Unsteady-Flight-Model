@@ -10,5 +10,5 @@
     "sea level temperature": 288.15, // K
     "stratosphere temperature": 216.65, // K
     "air molar mass": 0.0289644, // kg/mol
-    "temperature lapse rate in the troposphere": 0.0065, // K/m
+    "temperature lapse rate in the troposphere": 0.0065 // K/m
 }
