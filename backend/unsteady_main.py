@@ -21,10 +21,11 @@ state_vector = {
 def main(input_file):
     # initialize rocket inputs file
     rocket_inputs = unsteady_variable_initialization.read_input_file(input_file) # returns rocket_inputs dict
-    # initialize N2O properties dict only once for the whole program
+    # initialize N2O properties dict and constants dict only once for the whole program
     N2O_properties_dict = unsteady_N2O_properties.initialize_N2O_properties_dict()
+    constants_dict = unsteady_variable_initialization.initialize_natural_constants_dict()
     # initialize state vector (calculate value of all variables at t=0)
-    x_0 = unsteady_variable_initialization.initialize_state_vector(rocket_inputs, N2O_properties_dict)
+    x_0 = unsteady_variable_initialization.initialize_state_vector(rocket_inputs, N2O_properties_dict, constants_dict)
     print(x_0)
     
 

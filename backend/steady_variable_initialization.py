@@ -7,6 +7,12 @@ simulation_settings_dict = {
     "show graphs": True, # whether to show output graphs (flight data, parametric study graphs, etc)
     "save simulation data": True, 
     "parametric study settings": {}, # info gets filled in using input json
+    
+    # simulation constants
+    "number of timesteps": 100, # number of timesteps in burntime (only accounts for the part of the burn where there is a thrust). Ascent timesteps typically 300-400
+    "tolerated apogee difference": .01, # m, allowed space between target and real apogee
+    "smallest allowed inner fuel radius": 0.01, # m; equivalent to 1 cm
+    "parametric study step size undershoot tolerance": 0.1 # in %; the amount by which parametric studies will 'undershoot' the high end set by the user. For example, if low=1, high=4, step=1.45 --> list of values to parametrize = [1, 2.45, 3.9] (not [1, 2.45, 3.9, 5.35]) since 3.9 is close enough to 4
 }
 
 constants_dict = { # dictionary containing natural & simulation constants
@@ -21,6 +27,7 @@ constants_dict = { # dictionary containing natural & simulation constants
     "air molar mass": 0.0289644, # kg/mol
     "temperature lapse rate in the troposphere": 0.0065, # K/m
 
+    # want to eventually only use these from within simulation_settings_dict but have to track down all the instances where they are used first
     # simulation constants
     "number of timesteps": 100, # number of timesteps in burntime (only accounts for the part of the burn where there is a thrust). Ascent timesteps typically 300-400
     "tolerated apogee difference": .01, # m, allowed space between target and real apogee

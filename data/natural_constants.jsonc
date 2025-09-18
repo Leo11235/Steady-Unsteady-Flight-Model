@@ -1,0 +1,14 @@
+
+// this file contains natural constants to be used in steady and unsteady
+
+{
+    "sea level gravity": 9.80665, // m/s^2
+    "universal gas constant": 8.31446261815324, // J / (mol * K)
+    "ambient sea level atmospheric pressure": 101325,  // Pa 
+    "earth radius": 6378000, // m
+    "sea level air density": 1.225, // kg/m^3
+    "sea level temperature": 288.15, // K
+    "stratosphere temperature": 216.65, // K
+    "air molar mass": 0.0289644, // kg/mol
+    "temperature lapse rate in the troposphere": 0.0065, // K/m
+}

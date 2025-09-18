@@ -1,4 +1,8 @@
-{
+
+// This file contants various properties of N2O as a function of temperature, T
+// Serves as a lookup table for the unsteady program
+
+{ 
     "T": [ // [K]
         182.33,
         185.0,

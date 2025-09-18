@@ -1,6 +1,6 @@
 import itertools, numpy as np
 import steady_simulation_iterations as steady_simulation_iterations
-from steady_variable_initialization import constants_dict
+from steady_variable_initialization import simulation_settings_dict
 
 # runs parametric study, works for n inputs
 def run_paramatric_study(rocket_inputs, simulation_settings_dict):
@@ -9,7 +9,7 @@ def run_paramatric_study(rocket_inputs, simulation_settings_dict):
     # generate ranges for each variable
     var_ranges = {}
     for var_name, var_values in param_settings.items():
-        var_ranges[var_name] = generate_range(var_values["low end"], var_values["high end"], var_values["step size"], constants_dict.get("parametric study step size undershoot tolerance", 0.01))
+        var_ranges[var_name] = generate_range(var_values["low end"], var_values["high end"], var_values["step size"], simulation_settings_dict.get("parametric study step size undershoot tolerance", 0.01))
         
     # calculate total number of iterations
     total_iterations = np.prod([len(r) for r in var_ranges.values()])
