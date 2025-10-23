@@ -54,7 +54,11 @@ pip install -r requirements.txt
 ### 4. Verify your setup
 Run the verification test to make sure everything works:
 ```bash
+# Windows
 python backend/steady_venv_testing.py
+
+# Mac/Linux  
+python3 backend/steady_venv_testing.py
 ```
 You should see simulation loops running with apogee calculations, ending with:
 ```bash
@@ -78,7 +82,7 @@ Run the simulations:
 python backend/steady_main.py
 python backend/unsteady_main.py
 
-# # Mac/Linux  
+# Mac/Linux  
 python3 backend/steady_main.py
 python3 backend/unsteady_main.py
 ```
