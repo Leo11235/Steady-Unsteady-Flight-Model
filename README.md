@@ -1,7 +1,4 @@
-# Steady-Unsteady-Flight-Model
-McGill Rocket Team Steady-Unsteady Flight Model
-
-# Rocket Team Hybrid Engine Model
+# McGill Rocket Team Steady-Unsteady-Flight-Model
 
 This repository contains the computational models (Steady-State and Unsteady) for the nitrous oxide/paraffin wax hybrid rocket engine.
 
