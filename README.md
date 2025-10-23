@@ -14,6 +14,7 @@ Follow these steps to get the code running on your machine.
 **Check your Python version:**
 ```bash
 python --version
+```
 
 # Clone this repository
 git clone https://github.com/Leo11235/Steady-Unsteady-Flight-Model
