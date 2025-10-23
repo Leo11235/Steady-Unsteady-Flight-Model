@@ -57,3 +57,19 @@ You should see simulation loops running with apogee calculations, ending with:
 LOOP 9 - FINAL APOGEE: 13715.2 meters (0.81256 meters off from target)
 ```
 If you see this, your setup is complete and working!
+
+## Development workflow
+
+Always start by activating your environment:
+```bash
+# Windows
+venv\Scripts\activate
+
+# Mac/Linux  
+source venv/bin/activate
+```
+Run the simulations:
+```bash
+python backend/steady_main.py
+python backend/unsteady_main.py
+```
