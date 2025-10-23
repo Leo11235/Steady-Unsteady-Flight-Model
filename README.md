@@ -13,7 +13,11 @@ Follow these steps to get the code running on your machine.
 
 **Check your Python version:**
 ```bash
+# Windows
 python --version
+
+# Mac/Linux
+python3 --version
 ```
 
 ### 2. Clone this repository
@@ -70,6 +74,11 @@ source venv/bin/activate
 ```
 Run the simulations:
 ```bash
+# Windows
 python backend/steady_main.py
 python backend/unsteady_main.py
+
+# # Mac/Linux  
+python3 backend/steady_main.py
+python3 backend/unsteady_main.py
 ```
