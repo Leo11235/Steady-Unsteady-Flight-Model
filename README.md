@@ -16,6 +16,24 @@ Follow these steps to get the code running on your machine.
 python --version
 ```
 
-# Clone this repository
+### 2. Clone this repository
+```bash
 git clone https://github.com/Leo11235/Steady-Unsteady-Flight-Model
 cd Steady-Unsteady-Flight-Model
+```
+
+### 3. Set up your environment
+Windows
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate it
+venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Make sure everything is working
+python backend/steady_venv_testing.py
+```
