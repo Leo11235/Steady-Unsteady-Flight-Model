@@ -33,7 +33,27 @@ venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Make sure everything is working
+Mac/Linux
+```bash
+# Create virtual environment
+python3 -m venv venv
+
+# Activate it  
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 4. Verify your setup
+Run the verification test to make sure everything works:
+```bash
 python backend/steady_venv_testing.py
 ```
+You should see simulation loops running with apogee calculations, ending with:
+```bash
+LOOP 9 - FINAL APOGEE: 13715.2 meters (0.81256 meters off from target)
+```
+If you see this, your setup is complete and working!
