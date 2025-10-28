@@ -11,6 +11,17 @@ def initialize_N2O_properties_dict():
     cleaned = re.sub(r'/\*.*?\*/', '', cleaned, flags=re.DOTALL)
     # parse cleaned file into dicr
     N2O_properties_dict = json.loads(cleaned)
+    
+    # some quantities are in kmol, need to be converted to mol for SI units
+    N2O_properties_dict["v_v"] = [x / 1000 for x in N2O_properties_dict["v_v"]]
+    N2O_properties_dict["d_v_v/d_T"] = [x / 1000 for x in N2O_properties_dict["d_v_v/d_T"]]
+    N2O_properties_dict["d_u_l/d_T"] = [x / 1000 for x in N2O_properties_dict["d_u_l/d_T"]]
+    N2O_properties_dict["d_h_l/d_T"] = [x / 1000 for x in N2O_properties_dict["d_h_l/d_T"]]
+    N2O_properties_dict["d_u_v/d_T"] = [x / 1000 for x in N2O_properties_dict["d_u_v/d_T"]]
+    N2O_properties_dict["d_h_v/d_T"] = [x / 1000 for x in N2O_properties_dict["d_h_v/d_T"]]
+    N2O_properties_dict["d_c_v_v/d_T"] = [x / 1000 for x in N2O_properties_dict["d_c_v_v/d_T"]]
+    N2O_properties_dict["d_c_p_v/d_T"] = [x / 1000 for x in N2O_properties_dict["d_c_p_v/d_T"]]
+       
     return N2O_properties_dict
 
 
@@ -22,13 +33,13 @@ def get_N2O_property(property_name, tank_temp, N2O_properties_dict):
     
     # some variables have functions rather than relying on the lookup table
     if property_name == 'p':
-        return p_sat(tank_temp) # saturated pressure of N2O
+        return p_sat(tank_temp) # saturated pressure of N2O, Pa
     elif property_name == 'd_p/d_T':
-        return dp_sat_dT(tank_temp) # saturated pressure of N2O with respect to tank temp
+        return dp_sat_dT(tank_temp) # saturated pressure of N2O with respect to tank temp, dPa/dT
     elif property_name == 'v_l':
-        return v_l_sat(tank_temp) # saturated liquid molar volume of nitrous
+        return v_l_sat(tank_temp) # saturated liquid molar volume of nitrous, m^3/mol
     elif property_name == 'd_v_l/d_T':
-        return dv_l_sat_dT(tank_temp) # saturated liquid molar volume of nitrous with respect to tank temp
+        return dv_l_sat_dT(tank_temp) # saturated liquid molar volume of nitrous with respect to tank temp, d(m^3/mol)/dT
     
     T_list = N2O_properties_dict['T']
     
@@ -89,7 +100,7 @@ def v_l_sat(T_T):
     
     term_1 = 1 + (1 - T_T/c_3) ** c_4
     term_2 = c_2 ** term_1
-    return term_2 / c_1
+    return term_2 / (c_1 * 1000) # convert kmol to mol
 
 # return RoC of saturated liquid molar volume of nitrous oxide at temperature T_T
 def dv_l_sat_dT(T_T):
@@ -98,5 +109,5 @@ def dv_l_sat_dT(T_T):
     c_4 = 0.2882
     
     term_1 = (c_4 / c_3) * math.log(c_2) * v_l_sat(T_T)
-    term_2 = T_T * (1 - T_T/c_3) ** (c_4 - 1)
-    return term_1 * term_2
+    term_2 = (1 - T_T/c_3) ** (c_4 - 1)
+    return term_1 * term_2 / 1000 # convert kmol to mol

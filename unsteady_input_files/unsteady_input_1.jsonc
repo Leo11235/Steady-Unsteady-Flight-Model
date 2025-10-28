@@ -10,13 +10,13 @@
     // state vector init: tank
     "oxidizer total initial mass": 4, // m_o_tot [kg]
     "oxidizer molar mass": 0.044013, // W_o [kg/mol]
-    "dip tube external diameter": 0.02, // D_dt [m]
-    "dip tube internal diameter": 0.015, // d_dt [m]
+    "dip tube external diameter": 0.012, // D_dt [m]
+    "dip tube internal diameter": 0.008, // d_dt [m]
     "tank internal diameter": 0.2, // d_T [m]
-    "tank initial temperature": 220, // T_T, [K]
+    "tank initial temperature": 300, // T_T, [K]
     // ONE of the following:
-    "tank ullage factor": 0.5, // U 
-    "tank internal length": "", // L_T
+    "tank ullage factor": 0.5, // U [.]
+    "tank internal length": "", // L_T [m]
 
     // state vector init: combustion chamber
     "total initial fuel mass": 2, // m_f_tot [kg]

@@ -1,3 +1,6 @@
+from math import e
+
+
 # calculates air density for a given altitude
 def calculate_air_density(constants_dict, height):
     T0 = constants_dict["sea level temperature"]
