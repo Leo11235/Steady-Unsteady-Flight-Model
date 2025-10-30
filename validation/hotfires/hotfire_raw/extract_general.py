@@ -5,6 +5,12 @@ column_names = ['time_ms', 'run_pressure_V', 'fill_pressure_V', 'purge_pressure_
                 'thrust_V', 'cc_pressure_V', 'tank_temp_V', 'run_temp_V', 'vent_temp_V', 'garbage', 'run_pressure_sw', 'fill_pressure_sw', 
                 'purge_pressure_sw', 'tank_pressure_sw', 'tank_mass_sw', 'thrust_sw', 'cc_pressure_sw', 'run_temp_sw', 'tank_temp_sw','ven_temp_sw']
 
+#from 4.1
+column_names = ['time_ms', 'run_pressure_V', 'fill_pressure_V', 'purge_pressure_V', 'tank_pressure_V', 'tank_mass_V', 
+                'thrust_V', 'cc_pressure_V', 'tank_temp_V', 'run_temp_V', 'vent_temp_V', 'garbage', 'run_pressure_sw', 'fill_pressure_sw', 
+                'tank_pressure_sw', 'purge_pressure_sw', 'tank_mass_sw', 'thrust_sw', 'cc_pressure_sw', 'run_temp_sw', 'tank_temp_sw', 'ven_temp_sw']
+
+
 def convert_file (path):
     min = 100
     max = 0
@@ -19,7 +25,7 @@ def convert_file (path):
 
 
 if __name__ == "__main__":
-    arr = sorted(os.listdir("../../../Desktop/hotfire"))
+    arr = sorted(os.listdir("validation/hotfires/hotfire_raw/"))
     for file in arr:
         if (file.endswith(".txt")):
-            convert_file("../../../Desktop/hotfire/" + file)
+            convert_file("validation/hotfires/hotfire_raw/" + file)
