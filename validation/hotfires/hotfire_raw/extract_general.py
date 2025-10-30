@@ -1,4 +1,4 @@
-import os
+import os, json
 
 #current testsite setup 2023-02-17
 column_names = ['time_ms', 'run_pressure_V', 'fill_pressure_V', 'purge_pressure_V', 'tank_pressure_V', 'tank_mass_V', 
@@ -12,16 +12,27 @@ column_names = ['time_ms', 'run_pressure_V', 'fill_pressure_V', 'purge_pressure_
 
 
 def convert_file (path):
-    min = 100
-    max = 0
+    dic = {}
     with open(path, 'r') as file:
+        length = 0
         for line in file:
-            stripped = str(line.strip())
-            len_split = int(len(stripped.split()))
+            len_split = int(len(str(line.strip()).split()))
             if len_split != 0:
-                if (len_split > max): max = len_split
-                elif (len_split < min): min = len_split
-        print(f"{path} has max words {max} and min words {min}")
+                length = len_split
+                break
+        
+        print(f"{path} has words {length}")
+        for i in range(length):
+            dic[f"col{i}"] = []
+        for line in file:
+            split_arr = str(line.strip()).split()
+            if int(len(split_arr)) == 0: continue
+            # print (split_arr)
+            for i in range(length - 1):
+                # print(f"{i}: {split_arr[i]}")
+                dic[f"col{i}"].append(split_arr[i])
+    with open(f"{path[:-4]}.jsonc", "w") as f:
+        json.dump(dic, f, indent=4)
 
 
 if __name__ == "__main__":
