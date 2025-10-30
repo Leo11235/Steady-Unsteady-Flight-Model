@@ -11,4 +11,5 @@
     "stratosphere temperature": 216.65, // K
     "air molar mass": 0.0289644, // kg/mol
     "temperature lapse rate in the troposphere": 0.0065 // K/m
+    // "nitrous oxide molar mass": 0.044013 // kg/mol // already in rocket inputs, not sure where it should really be
 }
