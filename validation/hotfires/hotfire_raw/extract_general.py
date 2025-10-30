@@ -19,7 +19,7 @@ def convert_file (path):
 
 
 if __name__ == "__main__":
-    arr = sorted(os.listdir("validation/hotfires/hotfire_raw/"))
+    arr = sorted(os.listdir("../../../Desktop/hotfire"))
     for file in arr:
         if (file.endswith(".txt")):
-            convert_file("validation/hotfires/hotfire_raw/" + file)
+            convert_file("../../../Desktop/hotfire/" + file)
