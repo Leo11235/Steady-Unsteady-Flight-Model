@@ -57,7 +57,7 @@ def initialize_state_vector(rocket_inputs, N2O_properties_dict, constants_dict):
         print("Initializing state vector using tank internal length")
         return initialize_state_vector_using_tank_length(rocket_inputs, v_l, v_v, m_o_tot_0, W_o, d_T, D_dt, d_dt)
     elif rocket_inputs.get("tank ullage factor", "") != "":
-        print("Initializing state vector using tank ullage")
+        # print("Initializing state vector using tank ullage")
         V_l, n_l, n_v, L_T, L_dt = initialize_state_vector_using_ullage(rocket_inputs, v_l, v_v, m_o_tot_0, W_o, d_T, D_dt, d_dt)
     else:
         raise ImportError("Tank length and ullage not found")
