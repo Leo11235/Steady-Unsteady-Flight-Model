@@ -56,9 +56,8 @@ def iterate_over_fuel_mass(rocket_inputs):
 def correct_apogee_reached(rocket_inputs, rocket_parameters):
     return True if abs(rocket_parameters["reached apogee"] - rocket_inputs["target apogee"]) <= constants_dict["tolerated apogee difference"] else None
 
-
-
 # takes rocket input data, outputs rocket performance becnhmarks
+# used mainly for hotfire tests
 def simulate_rocket_burn(rocket_inputs, rocket_parameters):
     # step 1
     steady_calculations.CV2_calculations(rocket_inputs, rocket_parameters)

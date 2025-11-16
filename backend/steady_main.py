@@ -26,7 +26,7 @@ def main(input_file_path):
         # put initial internal fuel radius into rocket_parameters for later calculations
         rocket_parameters = {"initial internal fuel radius": rocket_inputs["initial internal fuel radius"]} 
         # run simulation
-        return simulate_rocket_burn(rocket_inputs, rocket_parameters)
+        return rocket_inputs, simulate_rocket_burn(rocket_inputs, rocket_parameters)
     
     # fuel mass convergence
     elif simulation_settings_dict["simulation type"].lower() == "fuel mass convergence": # converges on ideal fuel mass given a target apogee
@@ -51,23 +51,35 @@ def print_dict(input_dictionary):
     for key, value in input_dictionary.items():
         print(f"{key} {"." * (max_key_length - len(str(key)) + 2)} {value}")
     print()
+    
+def format_hotfire_results(rocket_inputs, rocket_parameters):
+    hotfire_dict = {
+        "rocket name": rocket_inputs["rocket name"], 
+        "thrust": rocket_parameters["thrust"], 
+        "burntime": rocket_parameters["burntime"],
+        "Isp": rocket_parameters["Isp"], 
+        "total impulse": rocket_parameters["total impulse"], 
+        "average oxidizer mass flow rate": rocket_inputs["oxidizer mass flow rate"],
+        "chamber pressure": rocket_inputs["chamber pressure"],
+        "oxidizer mass": rocket_parameters["burntime"] * rocket_inputs["oxidizer mass flow rate"],
+        "fuel mass": rocket_parameters["fuel mass"],
+        "fuel length": rocket_inputs["fuel length"],
+        "fuel external radius": rocket_inputs["fuel external radius"], 
+        "fuel internal radius": rocket_parameters["initial internal fuel radius"],
+        "chamber temperature": rocket_parameters["chamber temperature"], 
+        
+    }
+    print("=================================================\n========== STEADY HOTFIRE TEST RESULTS ==========\n=================================================\n")
+    print_dict(hotfire_dict)
+    
+    return hotfire_dict
+    
 
 if __name__ == '__main__':
-    # get file and run simulation
-    file = "./steady_input_files/Esteban's_Ancalagon.jsonc"
-    data = main(file)
+    #########################
+    # Run hotfire tests
+    #########################
     
-    # save data
-    if simulation_settings_dict["save simulation data"]:
-        with open("steady_output_files/simulation_output.json", "w") as f:
-            json.dump(data, f, indent=4)
-            
-    # graph data
-    
-    # estimate 'file size' of data
-    json_str = json.dumps(data)
-    size_bytes = len(json_str.encode('utf-8'))
-    size_kb = size_bytes / 1024
-    size_mb = size_kb / 1024
-    print(f"Estimated JSON size: {size_bytes} bytes ({size_kb:.2f} KB / {size_mb:.2f} MB)")
-
+    # Hotfire 3.1
+    rocket_inputs, rocket_parameters = main("./steady_validation_input_files/Hotfire_3.1_inputs.jsonc")
+    format_hotfire_results(rocket_inputs, rocket_parameters)
