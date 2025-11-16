@@ -13,20 +13,21 @@ column_names = ['time_ms', 'run_pressure_V', 'fill_pressure_V', 'purge_pressure_
                 'tank_pressure_sw', 'purge_pressure_sw', 'tank_mass_sw', 'thrust_sw', 'cc_pressure_sw', 'run_temp_sw', 'tank_temp_sw', 'ven_temp_sw']
 
 references = [
+    # name, start_t, end_t, thrust_col
     # ["2.1", -1, -1],
-    ["2.2", 7380, 7400],
-    ["2.3", 4775, 4850],
-    ["2.4", 3600, 3820],
+    ["2.2", 7380, 7400, "col16"],
+    ["2.3", 4775, 4850, "col17"],
+    ["2.4", 3600, 3820, "col17"],
     # ["2.5", -1, -1],
-    ["2.6", 4300, 4375],
-    ["2.7", 3450, 3525],
+    ["2.6", 4300, 4375, "col17"], #col17 ? why so low
+    ["2.7", 3450, 3525, "col17"],
     # ["2.8", -1, -1],
-    ["3.1", 4675, 4735],
-    ["3.2", 4570, 4610],
-    ["3.3", 4430, 4470],
-    ["3.4", 4330, 4360],
-    ["3.5", 2200, 2240],
-    ["4.1", 6625, 6675]
+    ["3.1", 4675, 4735, "col17"],
+    # ["3.2", 4570, 4610],
+    # ["3.3", 4430, 4470],
+    ["3.4", 4330, 4360, "col17"],
+    ["3.5", 2200, 2240, "col17"],
+    ["4.1", 6625, 6675, "col17"],# off by 1000
 ]
 
 
@@ -97,20 +98,60 @@ def print_all_graphs (path):
             print(f"{path} + key {k} has length {len(dic[k])}")
             continue
         i = i + 1
+        if (i < 16): continue
         # if (column_names[i].__contains__("_V")): continue
         plt.figure(i - 1)
         plt.xlabel('seconds')
         plt.ylabel(k)
         plt.plot(sec, dic[k])
         plt.title(path + ' graph ' + k + " " + column_names[i] + "???")
-        plt.yticks(np.arange(min(dic[k]), max(dic[k]), (max(dic[k])-min(dic[k]))/10))
+        diff = (max(dic[k])-min(dic[k]))
+        if (diff == 0): diff = 0.1
+        plt.yticks(np.arange(min(dic[k]), max(dic[k]), diff/10))
+    plt.show()
+
+def read_write_raw_processed_jsonc (path, reference_list):
+    dic = {}
+    with open (path) as f:
+        dic = json.load(f)
+    
+    output_dic = {}
+    output_dic['seconds'] = dic['seconds']
+    output_dic['thrust'] = dic[reference_list[3]]
+    if (reference_list[0] == "4.1"): output_dic['thrust'] = [1000 * i for i in output_dic['thrust']]
+
+    with open(f"validation/hotfires/hotfire_processed/HOTFIRE{reference_list[0]}.jsonc", "w") as f:
+        json.dump(output_dic, f, indent=4)
+
+def graph_all (path):
+    dic = {}
+    with open (path) as f:
+        dic = json.load(f)
+    sec = dic['seconds']
+    i = 0
+    for k in dic.keys():
+        if (k == "seconds"): continue
+        if (len(sec) != len (dic[k])):
+            print(f"{path} + key {k} has length {len(dic[k])}")
+            continue
+        i = i + 1
+        plt.figure(i - 1)
+        plt.xlabel('seconds')
+        plt.ylabel(k)
+        plt.plot(sec, dic[k])
+        plt.title(path + ' graph ' + k)
+        diff = (max(dic[k])-min(dic[k]))
+        if (diff == 0): diff = 0.1
+        plt.yticks(np.arange(min(dic[k]), max(dic[k]), diff/10))    
     plt.show()
 
 
 if __name__ == "__main__":
     arr = reversed(references)
     for list in arr:
-        if (list[0] != "2.2"): continue
-        #convert_file("validation/hotfires/hotfire_raw/HOTFIRE" + list[0] + ".txt", list[1], list[2])
-        print_all_graphs("validation/hotfires/hotfire_raw/HOTFIRE" + list[0] + ".jsonc")
+        # if (list[0] != "4.1"): continue
+        # convert_file("validation/hotfires/hotfire_raw/HOTFIRE" + list[0] + ".txt", list[1], list[2])
+        # print_all_graphs("validation/hotfires/hotfire_raw/HOTFIRE" + list[0] + ".jsonc")
+        read_write_raw_processed_jsonc("validation/hotfires/hotfire_raw/HOTFIRE" + list[0] + ".jsonc", list)
+        graph_all("validation/hotfires/hotfire_processed/HOTFIRE" + list[0] + ".jsonc")
         
