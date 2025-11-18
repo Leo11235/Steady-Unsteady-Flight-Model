@@ -17,6 +17,8 @@ state_vector = {
     'a_R': [], # vertical acceleration
 }
 
+state_derivative_vector = {} # tracks the derivatives of the same variables as in the state vector
+
 # whole program is run from here
 def main(input_json):
     # initialize rocket inputs file

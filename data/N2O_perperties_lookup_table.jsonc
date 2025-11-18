@@ -32,9 +32,6 @@
         305.0,
         309.52
     ],
-    "h_o": [
-        // will need to add this one in
-    ], // Oxidizer molar enthalpy [kJ/mol]
     "v_v": [ // vapor molar volume [m^3/kmol]
         16.823,
         14.503,

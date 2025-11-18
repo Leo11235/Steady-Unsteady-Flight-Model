@@ -47,17 +47,22 @@ def ODE_master(cached_data):
     # other variables
         # v_l = Oxidizer liquid molar volume
         # v_v = Oxidizer vapor molar volume
+        # p_T
+        # p_loss
+        # C_i, N_i, A_i: injector flow coefficient, number of holes, and area per hole
         
     # unpack dicts; these serve as lookup tables
     (N2O_properties_dict, PROPEP_lookup_dict) = dicts
+    
+    # create a time derivative state vector, with values to be filled in during the following calculations
+    dx_dt = [time, 0,0,0,0,0,0,0,0,0,0]
     
     # ============================================
     # ========== CV1: Tank calculations ==========
     # ============================================
     
-    # calculate some important values first
-    n_dot = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_l))
-    # oxidizer molar flow rate
+    # in this section, the following quantities are calculated:
+    # x = [n_v, n_l, T_T]
     
     # For the tank, there are two cases: liquid blowdown (n_l>0; there is liquid in the tank) and gaseous blowdown (n_l=0; there is only vapor in the tank)
     if n_l > 1e-10: # Liquid-vapor blowdown; pick a number slightly above 0 so the simulation doesn't stall
@@ -68,24 +73,55 @@ def ODE_master(cached_data):
         u_l = get_N2O_property("u_l", T_T, N2O_properties_dict) # liquid internal energy [J/(mol-K)]
         d_u_l_d_T_T = get_N2O_property("d_u_l/d_T", T_T, N2O_properties_dict) # liquid internal energy with respect to temperature [J/(mol-K)]
         d_u_v_d_T_T = get_N2O_property("d_u_v/d_T", T_T, N2O_properties_dict) # vapor internal energy with respect to temperature [J/(mol-K)]
-        h_o = get_N2O_property # Oxidizer molar enthalpy
+        h_o = get_N2O_property("h_l", T_T, N2O_properties_dict) # Oxidizer molar enthalpy (for liquid oxidizer)
         
-        # solve Ax=b system, where x = [n_v, n_l, T_T]
+        # oxidizer molar flow rate (for liquid blowdown only)
+        n_dot = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_l))
+        
+        # set up Ax=b system, where dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
         A = np.array([
             [1, 1, 0], 
             [v_v, v_l, n_v * d_v_v_d_T_T + n_l * d_v_l_d_T_T],
             [u_v, u_l, n_v * d_u_v_d_T_T + n_l * d_u_l_d_T_T]
         ])
         b = np.array([-n_dot, 0, -n_dot * h_o])
-        pass
+        
+        # solve and assign values to the time derivative state vector
+        x = np.linalg.solve(A, b)
+        dn_v_dt, dn_l_dt, dT_T_dt = x
+        dx_dt[1] = dn_v_dt
+        dx_dt[2] = dn_l_dt
+        dx_dt[3] = dT_T_dt
+        
     else: # Gaseous blowdown, solve Ax=b system but different
-        pass
-    
+        # polytropic exponent, approximated as the heat capacity ratio (m = heat capacity at constant pressure of vapor / heat capacity at constant volume of vapor)
+        m = get_N2O_property("c_p_v", T_T, N2O_properties_dict) / get_N2O_property("c_v_v", T_T, N2O_properties_dict)
+        
+        # solve for the quantities dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
+        dn_v_dt = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_v))
+        dn_l_dt = 0
+        dT_T_dt = T_T * (m-1) * dn_v_dt / n_v
+        
+        # assign values to the time derivative state vector
+        dx_dt[1] = dn_v_dt
+        dx_dt[2] = dn_l_dt
+        dx_dt[3] = dT_T_dt
     
     
     # ==========================================================
     # ========== CV2: Combustion chamber calculations ==========
     # ==========================================================
+    
+    # in this section, the following quantities are calculated:
+    # x = [r_f, m_o, m_f, p_C]
+    
+    # Fuel regression rate
+    if r_f > 1e-10:
+        G_o = mdot_o_in / (np.pi * r_f**2)
+        dr_f_dt = a_reg * (G_o ** n_reg)
+    else:
+        dr_f_dt = 0
+    dxdt[4] = dr_f_dt
     
     
     # ==============================================
@@ -93,7 +129,15 @@ def ODE_master(cached_data):
     # ==============================================
     
     
+    
+    
     # ===================================================
     # ========== CV4: Rocket body calculations ==========
     # ===================================================
+    
+    
+    
     return
+
+
+

@@ -1,13 +1,13 @@
 '''
 Full guide of variable names: 
-    - p: saturated pressure of N2O [Pa]
-    - v_v: vapor molar volume [m^3/kmol]
-    - u_l: liquid internal energy [kJ/(mol-K)] ###### NEED TO CONVERT FROM kJ TO j
-    - h_l: 
-    - u_v: 
-    - h_v: 
-    - c_v_v
-    - c_p_v
+    - p:             saturated pressure of N2O [Pa]
+    - v_v:           vapor molar volume [m^3/kmol]
+    - u_l:           #### liquid internal energy [kJ/(mol-K) or kJ/(mol)]
+    - u_v:           #### vapor internal energy [kJ/(mol-K) or kJ/(mol)] 
+    - h_l:           liquid molar enthalpy [kJ/mol]
+    - h_v:           vapor molar enthalpy [kJ/mol]
+    - c_v_v:         heat capacity at constant volume of vapor [kJ/(mol*K)]
+    - c_p_v:         heat capacity at constant pressure of vapor [kJ/(mol*K)]
     - d_v_v/d_T
     - d_u_l/d_T
     - d_h_l/d_T
@@ -46,9 +46,10 @@ def initialize_N2O_properties_dict():
     N2O_properties_dict["d_c_p_v/d_T"] = [x / 1000 for x in N2O_properties_dict["d_c_p_v/d_T"]]
     
     # some quantities are in [kJ], need to be converted to [J]
-    N2O_properties_dict["u_l"] = [x / 1000 for x in N2O_properties_dict["u_l"]]
+    # commented some of these out bc I think they are wrong, this will be the first thing to check when things inevitably don't work perfectly
+    #N2O_properties_dict["u_l"] = [x / 1000 for x in N2O_properties_dict["u_l"]]
     N2O_properties_dict["h_l"] = [x / 1000 for x in N2O_properties_dict["h_l"]]
-    N2O_properties_dict["u_v"] = [x / 1000 for x in N2O_properties_dict["u_v"]]
+    #N2O_properties_dict["u_v"] = [x / 1000 for x in N2O_properties_dict["u_v"]]
     N2O_properties_dict["h_v"] = [x / 1000 for x in N2O_properties_dict["h_v"]]
     N2O_properties_dict["c_v_v"] = [x / 1000 for x in N2O_properties_dict["c_v_v"]]
     N2O_properties_dict["c_p_v"] = [x / 1000 for x in N2O_properties_dict["c_p_v"]]
