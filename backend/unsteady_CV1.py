@@ -41,7 +41,7 @@ def liquid_oxidizer_blowdown(C_i, N_i, A_i,n_l, n_v, p_loss, p_c, W_o,TT, N2O_pr
     # -----------------------
     # (3.3) -> 1*dnv + 1*dnl + 0*dT = n_dot
     a11, a12, a13 = 1.0, 1.0, 0.0
-    b1 = n_dot
+    b1 = - n_dot
 
     # (3.6) -> v_v*dnv + v_l*dnl + (nv*dv_v/dT + nl*dv_l/dT)*dT = 0
     a21 = v_v
@@ -53,7 +53,7 @@ def liquid_oxidizer_blowdown(C_i, N_i, A_i,n_l, n_v, p_loss, p_c, W_o,TT, N2O_pr
     a31 = u_v
     a32 = u_l
     a33 = n_l * du_l_dT + n_v * du_v_dT
-    b3 = n_dot * h_o
+    b3 = - n_dot * h_o
 
     A = np.array([[a11, a12, a13],
                   [a21, a22, a23],

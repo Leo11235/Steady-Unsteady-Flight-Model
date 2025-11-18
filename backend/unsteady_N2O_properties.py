@@ -1,3 +1,25 @@
+'''
+Full guide of variable names: 
+    - p: saturated pressure of N2O [Pa]
+    - v_v: vapor molar volume [m^3/kmol]
+    - u_l: liquid internal energy [kJ/(mol-K)] ###### NEED TO CONVERT FROM kJ TO j
+    - h_l: 
+    - u_v: 
+    - h_v: 
+    - c_v_v
+    - c_p_v
+    - d_v_v/d_T
+    - d_u_l/d_T
+    - d_h_l/d_T
+    - d_u_v/d_T
+    - d_h_v/d_T
+    - d_c_v_v/d_T
+    - d_c_p_v/d_T
+    
+    - d_p/d_T # idk where this one comes from
+'''
+
+
 import re, json, math, bisect
 
 # returns N2O properties dict
@@ -12,7 +34,8 @@ def initialize_N2O_properties_dict():
     # parse cleaned file into dicr
     N2O_properties_dict = json.loads(cleaned)
     
-    # some quantities are in kmol, need to be converted to mol for SI units
+    # conversions (I hope these are right)
+    # some quantities are in [.../(kmol)], need to be converted to [.../mol] for SI units
     N2O_properties_dict["v_v"] = [x / 1000 for x in N2O_properties_dict["v_v"]]
     N2O_properties_dict["d_v_v/d_T"] = [x / 1000 for x in N2O_properties_dict["d_v_v/d_T"]]
     N2O_properties_dict["d_u_l/d_T"] = [x / 1000 for x in N2O_properties_dict["d_u_l/d_T"]]
@@ -21,7 +44,15 @@ def initialize_N2O_properties_dict():
     N2O_properties_dict["d_h_v/d_T"] = [x / 1000 for x in N2O_properties_dict["d_h_v/d_T"]]
     N2O_properties_dict["d_c_v_v/d_T"] = [x / 1000 for x in N2O_properties_dict["d_c_v_v/d_T"]]
     N2O_properties_dict["d_c_p_v/d_T"] = [x / 1000 for x in N2O_properties_dict["d_c_p_v/d_T"]]
-       
+    
+    # some quantities are in [kJ], need to be converted to [J]
+    N2O_properties_dict["u_l"] = [x / 1000 for x in N2O_properties_dict["u_l"]]
+    N2O_properties_dict["h_l"] = [x / 1000 for x in N2O_properties_dict["h_l"]]
+    N2O_properties_dict["u_v"] = [x / 1000 for x in N2O_properties_dict["u_v"]]
+    N2O_properties_dict["h_v"] = [x / 1000 for x in N2O_properties_dict["h_v"]]
+    N2O_properties_dict["c_v_v"] = [x / 1000 for x in N2O_properties_dict["c_v_v"]]
+    N2O_properties_dict["c_p_v"] = [x / 1000 for x in N2O_properties_dict["c_p_v"]]
+    
     return N2O_properties_dict
 
 

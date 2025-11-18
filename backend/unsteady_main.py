@@ -27,7 +27,9 @@ def main(input_json):
     # initialize state vector (calculate value of all variables at t=0)
     x_0 = unsteady_variable_initialization.initialize_state_vector(rocket_inputs, N2O_properties_dict, constants_dict)
     update_state_vector(x_0)
+
     print(f"initial state vector: {x_0}")
+    print()
     print(state_vector)
     
     
@@ -50,4 +52,3 @@ if __name__ == '__main__':
     # get file and run simulation
     file = "./unsteady_input_files/unsteady_input_1.jsonc"
     data = main(file)
-    

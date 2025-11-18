@@ -32,6 +32,9 @@
         305.0,
         309.52
     ],
+    "h_o": [
+        // will need to add this one in
+    ], // Oxidizer molar enthalpy [kJ/mol]
     "v_v": [ // vapor molar volume [m^3/kmol]
         16.823,
         14.503,
@@ -234,7 +237,7 @@
         0.40691
     ],
     // derivatives of the quantities above in the same order: 
-    "d_v_v/d_T": [ // [m^3/(kmol-K)]
+    "d_v_v/d_T": [ // vapor molar volume with respect to temperature [m^3/(kmol-K)]
         -0.86891,
         -0.6828,
         -0.58932,
@@ -263,7 +266,7 @@
         -0.008962,
         -0.016533
     ],
-    "d_u_l/d_T": [ // [J/(kmol-K)]
+    "d_u_l/d_T": [ // liquid internal energy with respect to temperature [J/(kmol-K)]
         75535.0,
         75628.0,
         75719.0,
@@ -321,7 +324,7 @@
         170200.0,
         496681.0
     ],
-    "d_u_v/d_T": [ // [J/(kmol-K)]
+    "d_u_v/d_T": [ // vapor internal energy with respect to temperature [J/(kmol-K)]
         19850.0,
         19600.0,
         19200.0,
