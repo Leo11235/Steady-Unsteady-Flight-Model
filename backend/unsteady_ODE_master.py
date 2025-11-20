@@ -29,7 +29,7 @@ def ODE_master(cached_data):
     # ========== Unpack cached data ==========
     # ========================================
     
-    (x, dicts, v_l, v_v, p_T, p_loss, C_i, N_i, A_i, W_o) = cached_data # there will be more stuff in the paratheses
+    (x, dicts, dt, v_l, v_v, p_T, p_loss, C_i, N_i, A_i, W_o, a, n, A_t) = cached_data # there will be more stuff in the paratheses
     
     # x is the state vector, also needs to be unpacked (need to verify units)
         # n_v = moles of N2O vapor in the tank [mol]
@@ -39,23 +39,35 @@ def ODE_master(cached_data):
         # m_o = oxidizer mass in the combustion chamber [kg]
         # m_f = fuel mass in the combustion chamber [kg]
         # p_C = combustion chamber pressure [Pa]
-        # z_R = rocket altitude
-        # v_R = rocket velocity
-        # a_R = rocket acceleration
+        # z_R = rocket altitude [m]
+        # v_R = rocket velocity [m/s]
+        # a_R = rocket acceleration [m/s^2]
     (time, n_v, n_l, T_T, r_f, m_o, m_f, p_C, z_R, v_R, a_R) = x
     
     # other variables
-        # v_l = Oxidizer liquid molar volume
-        # v_v = Oxidizer vapor molar volume
+        # dt: timestep length
+        # v_l: Oxidizer liquid molar volume
+        # v_v: Oxidizer vapor molar volume
         # p_T
         # p_loss
         # C_i, N_i, A_i: injector flow coefficient, number of holes, and area per hole
+        # a: regresion rate scaling constant
+        # W_o: Oxidizer molar weight
+        # n: Regression rate exponent
+        # A_t: nozzle throat area
+        #
         
     # unpack dicts; these serve as lookup tables
     (N2O_properties_dict, PROPEP_lookup_dict) = dicts
     
     # create a time derivative state vector, with values to be filled in during the following calculations
     dx_dt = [time, 0,0,0,0,0,0,0,0,0,0]
+    
+    
+    
+    
+    ########################
+    # all of the below will be in a while loop
     
     # ============================================
     # ========== CV1: Tank calculations ==========
@@ -115,13 +127,19 @@ def ODE_master(cached_data):
     # in this section, the following quantities are calculated:
     # x = [r_f, m_o, m_f, p_C]
     
-    # Fuel regression rate
-    if r_f > 1e-10:
-        G_o = mdot_o_in / (np.pi * r_f**2)
-        dr_f_dt = a_reg * (G_o ** n_reg)
+    # r_f
+    if r_f > 1e-10: # might be smaller than ideal
+        dr_f_dt = a * ((W_o * n_dot)/(np.pi * r_f**2)) ** n
     else:
         dr_f_dt = 0
-    dxdt[4] = dr_f_dt
+    dx_dt[4] = dr_f_dt
+    
+    # m_o and m_f
+    OF = m_o / m_f # oxidizer to fuel ratio
+    M_t = 1 # Nozzle throat Mach number, ############################################## assume it's 1 for now, might have to be refined later
+    dm_n_dt = A_t * p_C * M_t * np.sqrt() # nozzle total propellant mass flow rate
+    
+    # p_C
     
     
     # ==============================================
@@ -137,6 +155,22 @@ def ODE_master(cached_data):
     
     
     
+    
+    # ==================================
+    # ==== Compute new state vector ====
+    # ==================================
+    
+    x[1] = dx_dt[1] * dt
+    x[2] = dx_dt[2] * dt
+    x[3] = dx_dt[3] * dt
+    x[4] = dx_dt[4] * dt
+    x[5] = dx_dt[5] * dt
+    x[6] = dx_dt[6] * dt
+    x[7] = dx_dt[7] * dt
+    x[8] = dx_dt[8] * dt
+    x[9] = dx_dt[9] * dt
+    x[10] = dx_dt[10] * dt
+        
     return
 
 
