@@ -29,8 +29,8 @@ with open("HOTFIRE4.1.jsonc", 'r') as file:
         #total += num
         if times[i] >= MIN and times[i] <= MAX:
             total += num
-        if(num > largest):
-            largest = num
+            if(num > largest):
+                largest = num
         i += 1
     avg = total / i
     print(avg)
