@@ -1,3 +1,9 @@
+'''
+Documentation: 
+https://github.com/Leo11235/pypropep 
+'''
+
+
 import pypropep as ppp
 
 # takes dictionaries, extracts relevant information, returns
@@ -12,7 +18,7 @@ def runPROPEP(rocket_inputs, rocket_parameters):
     # calculations
     ppp.init() # initialize pypropep
 
-    # make sure everything matches nicely, otherwise everything is fucked
+    # make sure the propellants match nicely
     try:
         fuel = ppp.PROPELLANTS[fuel_name.upper()]
         oxidizer = ppp.PROPELLANTS[oxidizer_name.upper()]

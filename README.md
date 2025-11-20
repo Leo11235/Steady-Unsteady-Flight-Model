@@ -8,7 +8,7 @@ Follow these steps to get the code running on your machine.
 
 ### 1. Prerequisites
 
-*   **Python 3.13**
+*   **Python 3.13+**
 *   **Git**
 
 **Check your Python version:**

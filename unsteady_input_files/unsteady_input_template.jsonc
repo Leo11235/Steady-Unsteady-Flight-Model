@@ -20,13 +20,23 @@
     "tank ullage factor": "", // U 
     "tank internal length": "", // L_T
 
+    // CV1
     "oxidizer liquid volume": "", // V_l
     "oxidizer vapor volume": "", // V_V
+
     "tank oxidizer liquid moles": "", // n_l
     "tank oxidizer vapor moles": "", // n_v
-    
     "moles of N2O in vapor phase the tank": "", // v_v
-    "moles of N2O in liquid phase the tank": "" // v_l
+    "moles of N2O in liquid phase the tank": "", // v_l
+
+    "injector discharge coefficient": "", // C_i
+    "injector number of holes": "", // N_i
+    "injector hole area": "", // A_i (area PER hole)
+
+
+    // CV2
+    "regression rate scaling coefficient": "", // a
+    "regression rate exponent": "" // n
     
     
     
