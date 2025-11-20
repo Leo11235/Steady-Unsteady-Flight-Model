@@ -24,9 +24,9 @@
         "chamber pressure": 1792700, // Pa
 
         // need to find these
-        "fuel external radius": 0.0762, // m // not in data
-        "initial internal fuel radius": 0.02, // m; only used for hotfire tests // not in data
-        "fuel length": 0.6096, // m // not in data
+        "fuel external radius": 0.085725, // m
+        "initial internal fuel radius": 0.064008, // m
+        "fuel length": 0.6096, // m
 
 
         "launch site altitude": 364, // m // irrelevant

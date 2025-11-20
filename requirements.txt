@@ -5,7 +5,7 @@
 
 # General dependencies
 json5==0.10.0
-matplotlib==3.9.3
+matplotlib==3.10.7
 numpy==2.1.3
 pandas==2.2.3
 scipy==1.15.1
