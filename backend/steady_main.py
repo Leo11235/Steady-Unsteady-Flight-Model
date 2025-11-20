@@ -7,9 +7,9 @@ guide for dictionaries:
     burn_dict, ascent_dict respectively contain information about the rocket's flight during the burn and after the burn (in file rocket_ascent_simulator.py)
 '''
 
-from steady_variable_initialization import simulation_settings_dict, read_input_file
-from steady_simulation_iterations import iterate_over_fuel_mass, simulate_rocket_burn
-import steady_parametric_study as steady_parametric_study
+from .steady_variable_initialization import simulation_settings_dict, read_input_file
+from .steady_simulation_iterations import iterate_over_fuel_mass, simulate_rocket_burn
+from . import steady_parametric_study as steady_parametric_study
 import json
 
 def main(input_file_path):
@@ -51,23 +51,3 @@ def print_dict(input_dictionary):
     for key, value in input_dictionary.items():
         print(f"{key} {"." * (max_key_length - len(str(key)) + 2)} {value}")
     print()
-
-if __name__ == '__main__':
-    # get file and run simulation
-    file = "./steady_input_files/Esteban's_Ancalagon.jsonc"
-    data = main(file)
-    
-    # save data
-    if simulation_settings_dict["save simulation data"]:
-        with open("steady_output_files/simulation_output.json", "w") as f:
-            json.dump(data, f, indent=4)
-            
-    # graph data
-    
-    # estimate 'file size' of data
-    json_str = json.dumps(data)
-    size_bytes = len(json_str.encode('utf-8'))
-    size_kb = size_bytes / 1024
-    size_mb = size_kb / 1024
-    print(f"Estimated JSON size: {size_bytes} bytes ({size_kb:.2f} KB / {size_mb:.2f} MB)")
-
