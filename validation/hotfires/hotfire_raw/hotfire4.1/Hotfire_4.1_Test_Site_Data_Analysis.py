@@ -192,7 +192,11 @@ but it was too unreliable with the noisy data. While it might take a bit of
 time to tweak, hardcoding it like this is much more accurate. It can be very 
 quick after you've done it for the first time. """
 
-column_names = ['time_ms', 'run_pressure_V', 'fill_pressure_V', 'purge_pressure_V', 'tank_pressure_V', 'tank_mass_V', 'thrust_V', 'cc_pressure_V', 'tank_temp_V', 'run_temp_V', 'vent_temp_V', 'garbage', 'run_pressure_sw', 'fill_pressure_sw', 'tank_pressure_sw', 'purge_pressure_sw', 'tank_mass_sw', 'thrust_sw', 'cc_pressure_sw', 'run_temp_sw', 'tank_temp_sw', 'ven_temp_sw']
+column_names = ['time_ms', 'run_pressure_V', 'fill_pressure_V', 'purge_pressure_V', 
+                'tank_pressure_V', 'tank_mass_V', 'thrust_V', 'cc_pressure_V', 'tank_temp_V', 
+                'run_temp_V', 'vent_temp_V', 'garbage', 'run_pressure_sw', 'fill_pressure_sw', 
+                'tank_pressure_sw', 'purge_pressure_sw', 'tank_mass_sw', 'thrust_sw', 
+                'cc_pressure_sw', 'run_temp_sw', 'tank_temp_sw', 'ven_temp_sw']
 
 # Inverted purge VS tank pressure
 #column_names = ['time_ms', 'run_pressure_V', 'fill_pressure_V', 'purge_pressure_V', 'tank_pressure_V', 'tank_mass_V', 'thrust_V', 'cc_pressure_V', 'tank_temp_V', 'run_temp_V', 'vent_temp_V', 'garbage', 'run_pressure_sw', 'fill_pressure_sw', 'purge_pressure_sw', 'tank_pressure_sw', 'tank_mass_sw', 'thrust_sw', 'cc_pressure_sw', 'run_temp_sw', 'tank_temp_sw', 'ven_temp_sw']
