@@ -6,6 +6,7 @@ https://github.com/Leo11235/pypropep
 import pypropep as ppp
 import pandas as pd 
 import numpy as np
+import matplotlib.pyplot as plt
 ppp.init() # initialize pypropep once for many calls
 
 def call_PROPEP(OF, CP, CP_units = "atm"): # oxidizer to fuel ratio and chamber pressure; units can also be Pa, psi, or atm and the conversion will be handled automatically
@@ -115,3 +116,38 @@ def pyPROPEP_interpolation_lookup(OF, CP, lookup_table=ppp_df_loaded):
 #just checking
 #print(pyPROPEP_interpolation_lookup(2, 300))
 #print(pyPROPEP_interpolation_lookup(3.34, 756))
+
+def plot_surface_multiindex_numeric(df, z_col):
+    if z_col not in df.columns:
+        raise ValueError(f"{z_col} not in dataframe columns: {df.columns}")
+
+    temp = df.reset_index()
+
+    temp["OF"] = temp["OF"].astype(float)
+    temp["CP"] = temp["CP"].astype(float)
+    temp[z_col] = temp[z_col].astype(float)
+
+    pivot = temp.pivot(index="CP", columns="OF", values=z_col)
+
+    X, Y = np.meshgrid(pivot.columns.values, pivot.index.values)
+    Z = pivot.values
+
+    fig = plt.figure(figsize=(10,7))
+    ax = fig.add_subplot(111, projection='3d')
+
+    surf = ax.plot_surface(X, Y, Z, cmap="viridis", edgecolor='k', linewidth=0.5)
+
+    ax.set_xlabel("OF")
+    ax.set_ylabel("CP")
+    ax.set_zlabel(z_col)
+
+    ax.set_xlim(float(X.min()), float(X.max()))
+    ax.set_ylim(float(Y.min()), float(Y.max()))
+    ax.set_zlim(float(Z.min()), float(Z.max()))
+
+    fig.colorbar(surf, label=z_col)
+    plt.title(f"3D Surface of {z_col} vs OF & CP")
+    plt.show()
+
+#to check if the increments are too large
+#plot_surface_multiindex_numeric(ppp_df_loaded, "molar_weight")
