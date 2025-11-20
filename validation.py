@@ -1,6 +1,7 @@
-import os, json
+import json
 import matplotlib.pyplot as plt
 import numpy as np
+import backend as bk
 
 arr = ["2.2", "2.3", "2.4", "2.6", "2.7", "3.1", "3.4", "3.5", "4.1"]
 
@@ -63,9 +64,7 @@ if __name__ == "__main__":
     for n in arr:
         p = f"validation/hotfires/hotfire_processed/HOTFIRE{n}.jsonc"
         dic = dic_of(p)
-        # start, end = get_start_end_spike(2, dic['thrust'])
-        # print(dic['seconds'][start], dic['seconds'][end])
         graph_all(p)
-        # rocket_inputs, rocket_parameters = smain.main("./steady_validation_input_files/Hotfire_3.1_inputs.jsonc")
+        rocket_inputs, rocket_parameters = bk.steady_main.main("./steady_validation_input_files/Hotfire_3.1_inputs.jsonc")
         # plt.plot([dic['seconds'][0], dic['seconds'][len(dic['seconds']) - 1]], [steady[]])
         plt.show()
