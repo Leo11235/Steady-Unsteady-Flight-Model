@@ -1,7 +1,7 @@
-from steady_variable_initialization import simulation_settings_dict, constants_dict
-import steady_calculations as steady_calculations
-from pyPROPEP import runPROPEP
-from steady_rocket_ascent_simulator import simulate_rocket_ascent
+from .steady_variable_initialization import simulation_settings_dict, constants_dict
+from . import steady_calculations as steady_calculations
+from .pyPROPEP import runPROPEP
+from .steady_rocket_ascent_simulator import simulate_rocket_ascent
 
 # converges on an ideal fuel mass given a target apogee; returns rocket_inputs, rocket_parameters, flight_dict
 def iterate_over_fuel_mass(rocket_inputs):
@@ -56,9 +56,8 @@ def iterate_over_fuel_mass(rocket_inputs):
 def correct_apogee_reached(rocket_inputs, rocket_parameters):
     return True if abs(rocket_parameters["reached apogee"] - rocket_inputs["target apogee"]) <= constants_dict["tolerated apogee difference"] else None
 
-
-
 # takes rocket input data, outputs rocket performance becnhmarks
+# used mainly for hotfire tests
 def simulate_rocket_burn(rocket_inputs, rocket_parameters):
     # step 1
     steady_calculations.CV2_calculations(rocket_inputs, rocket_parameters)
