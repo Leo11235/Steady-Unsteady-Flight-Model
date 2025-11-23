@@ -4,6 +4,7 @@ import numpy as np
 from backend.steady_main import main, print_dict
 
 arr = ["2.2", "2.3", "2.4", "2.6", "2.7", "3.1", "3.4", "3.5", "4.1"]
+start_arr = [0, 0, 0, 0, 0, 0, 0, 0, 5]
 
 def dic_of (path):
     with open (path) as f:
@@ -34,48 +35,53 @@ def graph_all (path):
             continue
         i = i + 1
         plt.figure(i - 1)
-        plt.xlabel('seconds')
-        plt.ylabel(k)
-        # plt.plot(sec, dic[k]) # data thrust
-        plt.plot([sec[0], sec[-1]], [0, 0])
+        graph_thrust(path, sec, dic[k])
 
-        # total_impulse = 0
-        # for i in range(len(dic[k]) - 1): total_impulse += dic[k][i] * (sec[i + 1] - sec[i])
-        # print(f"{path}: total impulse (uncorrected) {total_impulse}")
+def graph_thrust (path, sec, dict_k):
+    plt.xlabel('seconds')
+    plt.ylabel('thrust')
+    # plt.plot(sec, dict_k) # data thrust
+    plt.plot([sec[0], sec[-1]], [0, 0])
 
-        last_avg = avg_last_vals(dic[k], 50)
-        first_index = getFirstLocAtVal(dic[k], last_avg)
-        for i in range(len(dic[k])):
-            if (i > first_index and dic[k][i] > 0.7 * last_avg): dic[k][i] -= last_avg
-        
-        plt.plot(sec, dic[k]) #adjusted thrust so it starts and ends ~0N
+    # total_impulse = 0
+    # for i in range(len(dict_k) - 1): total_impulse += dict_k[i] * (sec[i + 1] - sec[i])
+    # print(f"{path}: total impulse (uncorrected) {total_impulse}")
 
-        total_impulse = 0
-        for i in range(len(dic[k]) - 1): total_impulse += dic[k][i] * (sec[i + 1] - sec[i])
-        print(f"{path}: total impulse {total_impulse}")
+    last_avg = avg_last_vals(dict_k, 50)
+    first_index = getFirstLocAtVal(dict_k, last_avg)
+    for i in range(len(dict_k)):
+        if (i > first_index and dict_k[i] > 0.7 * last_avg): dict_k[i] -= last_avg
+    
+    plt.plot(sec, dict_k) #adjusted thrust so it starts and ends ~0N
 
-        plt.title(path + ' graph ' + k)
-        diff = (max(dic[k])-min(dic[k]))
-        if (diff == 0): diff = 0.1
-        plt.yticks(np.arange(min(dic[k]), max(dic[k]), diff/10)) 
+    plt.title(path + ' thrust graph')
+    diff = (max(dict_k)-min(dict_k))
+    if (diff == 0): diff = 0.1
+    plt.yticks(np.arange(min(dict_k), max(dict_k), diff/10)) 
+
+    tmax = 0
+    for thrustpoint in dict_k:
+        if (thrustpoint > tmax): tmax = thrustpoint
+    total_impulse = 0
+    for i in range(len(dict_k) - 1): total_impulse += dict_k[i] * (sec[i + 1] - sec[i])
+    print(f"{path}:\n\ttotal impulse {total_impulse} Ns\n\tpeak thrust = {tmax}N")
 
 def graph_steady (steady_dic, start_time):
-    # print(steady_dic)
     thrust = steady_dic[1]['thrust']
     burntime = steady_dic[1]['burntime']
     margin = 0.001
     plt.plot([start_time - margin, start_time, start_time + burntime, start_time + burntime+margin], [0, thrust, thrust, 0])
 
     total_impulse = steady_dic[1]['total impulse']
-    print(f"steady_sim total_impulse = {total_impulse}")
+    print(f"  steady_sim\n\ttotal_impulse = {total_impulse}\n\tthrust = {thrust}")
 
 
 if __name__ == "__main__":
-    for n in arr:
-        if (n != "4.1"): continue
-        p = f"validation/hotfires/hotfire_processed/HOTFIRE{n}.jsonc"
+    for i in range(len(arr)):
+        if (arr[i] != "3.1"): continue
+        p = f"validation/hotfires/hotfire_processed/HOTFIRE{arr[i]}.jsonc"
         dic = dic_of(p)
         graph_all(p)
-        graph_steady(main(f"steady_validation_input_files/Hotfire_{n}_steady.jsonc"), 5)
+        graph_steady(main(f"steady_validation_input_files/Hotfire_{arr[i]}_steady.jsonc"), start_arr[i])
         plt.show()
         break
