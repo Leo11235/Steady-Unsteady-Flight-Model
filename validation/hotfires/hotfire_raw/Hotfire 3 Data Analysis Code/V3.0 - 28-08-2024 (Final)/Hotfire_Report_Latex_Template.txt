@@ -1,0 +1,196 @@
+\documentclass[letterpaper,12pt]{article}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[margin=1in,letterpaper]{geometry}
+\usepackage{cite}
+\usepackage{float}
+\usepackage[final]{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    filecolor=magenta,
+    urlcolor=blue
+}
+
+\begin{document}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.7\textwidth]{logo.png}
+\end{figure}
+
+\title{{{ Hotfire ___ }}}
+\author{{{ Propulsion Subteam - McGill Rocket Team }}}
+\date{{{ YYYY/MM/DD }}}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\begin{table}[H]
+\begin{center}
+\caption{Summary Results}
+\label{tbl:issues}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Variable} & \textbf{Value} & \textbf{Unit} \\
+\hline
+Ambient Temperature &  & C \\
+\hline
+Run Tank Volume &  & L \\
+\hline
+Ullage Factor (estimate) &  & \% \\
+\hline
+Fuel Mass &  & kg \\
+\hline
+Fill Time &  & s \\
+\hline
+Peak Tank Pressure &  & psi \\
+\hline
+Peak Tank Temperature &  & C \\
+\hline
+Peak Casing Temperature &  & C \\
+\hline
+Peak Run Pressure &  & psi \\
+\hline
+Peak CC Pressure &  & psi \\
+\hline
+Injector Holes &  &  \\
+\hline
+Injector Hole Diameter &  & mm \\
+\hline
+Peak Mass Flow Rate (estimated) &  & kg/s \\
+\hline
+Average Mass Flow Rate (estimated) &  & kg/s \\
+\hline
+Burn Time &  & s \\
+\hline
+Peak Thrust &  & N \\
+\hline
+Total Impulse &  & Ns \\
+\hline
+Specific Impulse (nozzle estimate) &  & s \\
+\hline
+Specific Impulse (total impulse estimate) &  & s \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\begin{table}[H]
+\begin{center}
+\caption{Nitrous Mass Estimates}
+\label{tbl:issues}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Variable} & \textbf{Value} & \textbf{Unit} \\
+\hline
+Load Cell (end of fill) &  & kg \\
+\hline
+Ullage (25\%) &  & kg \\
+\hline
+Integrated Mass Flow Rate Fit &  & kg \\
+\hline
+Liquid Mass (estimate) &  & kg \\
+\hline
+Gas Mass (estimate) &  & kg \\
+\hline
+Mean Mass &  & kg \\
+\hline
+Standard Deviation &  & kg \\
+\hline
+Standard Error &  & kg \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\section{Plots}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{fill_pressure.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{fill_pressure_zoomed.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{tank_emptying_temp.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{mass_fill.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{tank_emptying_pressure.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{injector_pressure_drop.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{thrust.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{mass_tank_emptying.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{injector_mass_flow_rate.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{discharge_coefficient.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{nozzle_mass_flow_rate.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{isp.png}
+    \label{fig:labelname}
+\end{figure}
+
+\section{Issues Encountered}
+
+\section{Conclusions}
+
+\appendix
+
+\section{Engine Disassembly Pictures}
+
+
+\end{document}

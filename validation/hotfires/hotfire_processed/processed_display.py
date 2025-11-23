@@ -1,7 +1,6 @@
 import os, json
 import matplotlib.pyplot as plt
 import numpy as np
-import backend as bk
 
 arr = ["2.2", "2.3", "2.4", "2.6", "2.7", "3.1", "3.4", "3.5", "4.1"]
 
@@ -57,12 +56,16 @@ def graph_all (path):
         plt.yticks(np.arange(min(dic[k]), max(dic[k]), diff/10))    
 
 if __name__ == "__main__":
+    # spec = importlib.util.spec_from_file_location("steady_main", "./backend/steady_main.py")
+    # mod = importlib.util.module_from_spec(spec)
+    # spec.loader.exec_module(mod)    
+
     for n in arr:
         p = f"validation/hotfires/hotfire_processed/HOTFIRE{n}.jsonc"
         dic = dic_of(p)
         # start, end = get_start_end_spike(2, dic['thrust'])
         # print(dic['seconds'][start], dic['seconds'][end])
         graph_all(p)
-        steady = bk.steady_main.main("./steady_input_files/Esteban's_Ancalagon.jsonc")
+        # rocket_inputs, rocket_parameters = smain.main("./steady_validation_input_files/Hotfire_3.1_inputs.jsonc")
         # plt.plot([dic['seconds'][0], dic['seconds'][len(dic['seconds']) - 1]], [steady[]])
         plt.show()
