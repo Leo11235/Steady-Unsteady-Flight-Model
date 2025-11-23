@@ -1,0 +1,169 @@
+\documentclass[letterpaper,12pt]{article}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[margin=1in,letterpaper]{geometry}
+\usepackage{cite}
+\usepackage{float}
+\usepackage[final]{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    filecolor=magenta,
+    urlcolor=blue
+}
+
+\begin{document}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.7\textwidth]{logo.png}
+\end{figure}
+
+\title{{{ Hotfire 3.3 }}}
+\author{{{ Propulsion Subteam - McGill Rocket Team }}}
+\date{{{ 2023/11/18 }}}
+\maketitle
+
+\begin{abstract}
+
+
+\begin{table}[H]
+\begin{center}
+\caption{Summary Results}
+\label{tbl:issues}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Variable} & \textbf{Value} & \textbf{Unit} \\
+\hline
+Ambient Temperature & 5 & C \\
+\hline
+Run Tank Volume & 15.3 & L \\
+\hline
+Ullage Factor & 46 & \% \\
+\hline
+Fuel Mass & 1.900 & kg \\
+\hline
+Fill Time & 2707 & s \\
+\hline
+Peak Tank Pressure & 990 & psi \\
+\hline
+Peak Tank Temperature & 14 & C \\
+\hline
+Total Tank Mass (measured) & 7.7 & kg \\
+\hline
+Liquid Nitrous Mass (estimated) & 6.9 & kg \\
+\hline
+Gaseous Nitrous Mass (estimated) & 0.8 & kg \\
+\hline
+Peak Run Pressure & 741 & psi \\
+\hline
+Peak CC Pressure & 55 & psi \\
+\hline
+Injector Holes & 22 &  \\
+\hline
+Injector Hole Diameter & 2 & mm \\
+\hline
+Peak Mass Flow Rate (estimated) & 2.99 & kg/s \\
+\hline
+Average Mass Flow Rate (estimated) & 1.46 & kg/s \\
+\hline
+Burn Time & N/A & s \\
+\hline
+Peak Thrust & 456 & N \\
+\hline
+Total Impulse & 980 & Ns \\
+\hline
+Specific Impulse & 75 & s \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\end{abstract}
+
+\section{Plots}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{tank_fill_and_heating_pressure.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{tank_fill_pressure_zoomed.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{tank_emptying_temp.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{mass_filling_and_heating.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{tank_run_tank_emptying_pressure.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{run_cc_tank_emptying_pressure.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{thrust.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{mass_tank_emptying.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{injector_mass_flow_rate.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{discharge_coefficient.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{nozzle_mass_flow_rate.png}
+    \label{fig:labelname}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{isp.png}
+    \label{fig:labelname}
+\end{figure}
+
+\section{Issues Encountered}
+
+\section{Conclusions}
+
+\appendix
+
+\section{Engine Disassembly Pictures}
+
+
+\end{document}

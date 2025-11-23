@@ -1,6 +1,6 @@
 import itertools, numpy as np
-import steady_simulation_iterations as steady_simulation_iterations
-from steady_variable_initialization import simulation_settings_dict
+from . import steady_simulation_iterations as steady_simulation_iterations
+from .steady_variable_initialization import simulation_settings_dict
 
 # runs parametric study, works for n inputs
 def run_paramatric_study(rocket_inputs, simulation_settings_dict):
