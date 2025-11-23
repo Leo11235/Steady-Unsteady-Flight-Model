@@ -1,7 +1,7 @@
 import json
 import matplotlib.pyplot as plt
 import numpy as np
-import backend as bk
+from backend.steady_main import main, print_dict
 
 arr = ["2.2", "2.3", "2.4", "2.6", "2.7", "3.1", "3.4", "3.5", "4.1"]
 
@@ -23,6 +23,9 @@ def getFirstLocAtVal (list, value):
 def graph_all (path):
     dic = dic_of(path)
     sec = dic['seconds']
+    offset = sec[0]
+    for i in range(len(sec)):
+        sec[i] -= offset
     i = 0
     for k in dic.keys():
         if (k == "seconds"): continue
@@ -54,17 +57,25 @@ def graph_all (path):
         plt.title(path + ' graph ' + k)
         diff = (max(dic[k])-min(dic[k]))
         if (diff == 0): diff = 0.1
-        plt.yticks(np.arange(min(dic[k]), max(dic[k]), diff/10))    
+        plt.yticks(np.arange(min(dic[k]), max(dic[k]), diff/10)) 
+
+def graph_steady (steady_dic, start_time):
+    # print(steady_dic)
+    thrust = steady_dic[1]['thrust']
+    burntime = steady_dic[1]['burntime']
+    margin = 0.001
+    plt.plot([start_time - margin, start_time, start_time + burntime, start_time + burntime+margin], [0, thrust, thrust, 0])
+
+    total_impulse = steady_dic[1]['total impulse']
+    print(f"steady_sim total_impulse = {total_impulse}")
+
 
 if __name__ == "__main__":
-    # spec = importlib.util.spec_from_file_location("steady_main", "./backend/steady_main.py")
-    # mod = importlib.util.module_from_spec(spec)
-    # spec.loader.exec_module(mod)    
-
     for n in arr:
+        if (n != "4.1"): continue
         p = f"validation/hotfires/hotfire_processed/HOTFIRE{n}.jsonc"
         dic = dic_of(p)
         graph_all(p)
-        rocket_inputs, rocket_parameters = bk.steady_main.main("./steady_validation_input_files/Hotfire_3.1_inputs.jsonc")
-        # plt.plot([dic['seconds'][0], dic['seconds'][len(dic['seconds']) - 1]], [steady[]])
+        graph_steady(main(f"steady_validation_input_files/Hotfire_{n}_steady.jsonc"), 5)
         plt.show()
+        break

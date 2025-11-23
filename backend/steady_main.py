@@ -7,9 +7,9 @@ guide for dictionaries:
     burn_dict, ascent_dict respectively contain information about the rocket's flight during the burn and after the burn (in file rocket_ascent_simulator.py)
 '''
 
-from steady_variable_initialization import simulation_settings_dict, read_input_file
-from steady_simulation_iterations import iterate_over_fuel_mass, simulate_rocket_burn
-import steady_parametric_study as steady_parametric_study
+from .steady_variable_initialization import simulation_settings_dict, read_input_file
+from .steady_simulation_iterations import iterate_over_fuel_mass, simulate_rocket_burn
+from . import steady_parametric_study as steady_parametric_study
 import json
 
 def main(input_file_path):
