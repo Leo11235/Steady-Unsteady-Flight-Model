@@ -82,6 +82,6 @@ if __name__ == "__main__":
         p = f"validation/hotfires/hotfire_processed/HOTFIRE{arr[i]}.jsonc"
         dic = dic_of(p)
         graph_all(p)
-        graph_steady(main(f"steady_validation_input_files/Hotfire_{arr[i]}_steady.jsonc"), start_arr[i])
+        graph_steady(main(f"steady_inputs_files/Hotfire_{arr[i]}.jsonc"), start_arr[i])
         plt.show()
         break

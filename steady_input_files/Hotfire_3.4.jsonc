@@ -1,7 +1,7 @@
 {
     "simulation settings" : {
         // must be set
-        "simulation type": "hotfire validation", // can be 'fuel mass convergence', 'parametric study'
+        "simulation type": "hotfire", // can be 'fuel mass convergence', 'parametric study'
         // overrides defaults
         "debug comments": "detailed comments", 
         "output units": "SI", // SI, IMP, or MRT (rocket team's own mishmash of SI and IMP)
