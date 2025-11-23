@@ -3,8 +3,9 @@ from backend.steady_main import main, print_dict
 
 if __name__ == '__main__':
     # get file and run simulation
-    file = "./steady_input_files/Esteban's_Ancalagon.jsonc"
+    file = "./steady_validation_input_jsons/Hotfire_4.1_steady.jsonc"
     data = main(file)
+    print_dict(data)
     
     # estimate 'file size' of data
     json_str = json.dumps(data)
