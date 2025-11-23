@@ -3,6 +3,10 @@ from backend.steady_main import main, print_dict
 
 if __name__ == '__main__':
     # get file and run simulation
+    # file = "./steady_validation_input_jsons/Joel's_steady_comparison_1.jsonc"
+    # data = main(file)
+    # print_dict(data["rocket parameters"])
+    
     file = "./steady_validation_input_jsons/Hotfire_4.1_steady.jsonc"
     data = main(file)
     print_dict(data)
