@@ -20,8 +20,8 @@
         "rocket name": "Ancalagon",
         "target apogee": 13716, // m
 
-        "oxidizer mass flow rate": 1.025, // kg/s
-        "chamber pressure": 1792637, // Pa
+        "oxidizer mass flow rate": 0.77, // kg/s
+        "chamber pressure": 2633797, // Pa
         "fuel external radius": 0.0428625, // m
         "initial internal fuel radius": 0.032004, // m; only used for hotfire tests
         "fuel length": 0.6096, // m

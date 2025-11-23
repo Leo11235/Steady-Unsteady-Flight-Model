@@ -4,7 +4,7 @@ import numpy as np
 from backend.steady_main import main, print_dict
 
 arr = ["2.2", "2.3", "2.4", "2.6", "2.7", "3.1", "3.4", "3.5", "4.1"]
-start_arr = [0, 0, 0, 0, 0, 0, 0, 0, 5]
+start_arr = [0, 0, 0, 0, 0, 22.75, 9, 5.63, 5]
 
 def dic_of (path):
     with open (path) as f:
@@ -78,7 +78,7 @@ def graph_steady (steady_dic, start_time):
 
 if __name__ == "__main__":
     for i in range(len(arr)):
-        if (arr[i] != "3.1"): continue
+        if (arr[i] != "3.5"): continue
         p = f"validation/hotfires/hotfire_processed/HOTFIRE{arr[i]}.jsonc"
         dic = dic_of(p)
         graph_all(p)
