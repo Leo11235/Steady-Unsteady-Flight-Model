@@ -77,7 +77,7 @@ def graph_steady (steady_dic, start_time):
 
 
 if __name__ == "__main__":
-    cur_valid = list(["3.1", "3.2", "3.5", "4.1"]);
+    cur_valid = list(["3.1", "3.2", "3.4", "3.5", "4.1"]);
     for i in range(len(arr)):
         if (not arr[i] in cur_valid): continue
         p = f"validation/hotfires/hotfire_processed/HOTFIRE{arr[i]}.jsonc"
