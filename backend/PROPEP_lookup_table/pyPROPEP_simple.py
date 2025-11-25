@@ -151,3 +151,24 @@ def plot_surface_multiindex_numeric(df, z_col):
 
 #to check if the increments are too large
 #plot_surface_multiindex_numeric(ppp_df_loaded, "molar_weight")
+
+def get_chamber_properties_with_partials(p_C, OF, delta_OF=0.01, delta_p=1):
+    # get base values
+    T_base, W_base, gamma_base = pyPROPEP_interpolation_lookup(OF, p_C, lookup_table=ppp_df_loaded)
+    
+    # Perturb OF (for ∂/∂(OF)) - keep pressure constant
+    T_OF_plus, W_OF_plus, _ = pyPROPEP_interpolation_lookup(OF + delta_OF, p_C, lookup_table=ppp_df_loaded)
+    T_OF_minus, W_OF_minus, _ = pyPROPEP_interpolation_lookup(OF - delta_OF, p_C, lookup_table=ppp_df_loaded)
+    
+    # Perturb pressure (for ∂/∂p_C) - keep OF constant  
+    T_p_plus, W_p_plus, _ = pyPROPEP_interpolation_lookup(OF, p_C + delta_p, lookup_table=ppp_df_loaded)
+    T_p_minus, W_p_minus, _ = pyPROPEP_interpolation_lookup(OF, p_C - delta_p, lookup_table=ppp_df_loaded)
+    
+    # Calculate partial derivatives (central difference)
+    dT_dOF = (T_OF_plus - T_OF_minus) / (2 * delta_OF)
+    dW_dOF = (W_OF_plus - W_OF_minus) / (2 * delta_OF)
+    
+    dT_dp = (T_p_plus - T_p_minus) / (2 * delta_p)
+    dW_dp = (W_p_plus - W_p_minus) / (2 * delta_p)
+    
+    return T_base, W_base, gamma_base, dT_dOF, dW_dOF, dT_dp, dW_dp
