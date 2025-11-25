@@ -2,7 +2,7 @@ from unsteady_N2O_properties import get_N2O_property
 import numpy as np
 
 # do all the computationally expensive one-time setup stuff here, before passing it off to ODE_master
-def setup_ODE_master(state_vector, state_vector_history, rocket_inputs, constants_dict, N2O_properties_dict):
+def setup_ODE_master(rocket_inputs, constants_dict):
     # unpack rocket inputs
     # Tank
     # Chamber
@@ -24,7 +24,7 @@ def setup_ODE_master(state_vector, state_vector_history, rocket_inputs, constant
     return cached_data
 
 # runs all the ODEs in unsteady-state as optimizedly as possible
-def ODE_master(cached_data): 
+def ODE_master(cached_data, state_vector): 
     # ========================================
     # ========== Unpack cached data ==========
     # ========================================
@@ -68,122 +68,138 @@ def ODE_master(cached_data):
     
     
     ########################
-    # all of the below will be in a while loop
+    # ODE while loop:
+    while x[9]>0 and time != 1: # ends when velocity is 0 AND more than 1 second has elapsed
     
-    # ============================================
-    # ========== CV1: Tank calculations ==========
-    # ============================================
-    
-    # in this section, the following quantities are calculated:
-    # x = [n_v, n_l, T_T]
-    
-    # For the tank, there are two cases: liquid blowdown (n_l>0; there is liquid in the tank) and gaseous blowdown (n_l=0; there is only vapor in the tank)
-    if n_l > 1e-10: # Liquid-vapor blowdown; pick a number slightly above 0 so the simulation doesn't stall
-        # get N2O properties from lookup table
-        d_v_v_d_T_T = get_N2O_property("d_v_v/d_T", T_T, N2O_properties_dict) # vapor molar volume with respect to temperature [m^3/(mol-K)]
-        d_v_l_d_T_T = get_N2O_property("d_v_l/d_T", T_T, N2O_properties_dict) # liquid molar volume with respect to temperature [m^3/(mol-K)]
-        u_v = get_N2O_property("u_v", T_T, N2O_properties_dict) # vapor internal energy [J/mol]
-        u_l = get_N2O_property("u_l", T_T, N2O_properties_dict) # liquid internal energy [J/(mol-K)]
-        d_u_l_d_T_T = get_N2O_property("d_u_l/d_T", T_T, N2O_properties_dict) # liquid internal energy with respect to temperature [J/(mol-K)]
-        d_u_v_d_T_T = get_N2O_property("d_u_v/d_T", T_T, N2O_properties_dict) # vapor internal energy with respect to temperature [J/(mol-K)]
-        h_o = get_N2O_property("h_l", T_T, N2O_properties_dict) # Oxidizer molar enthalpy (for liquid oxidizer)
-        
-        # oxidizer molar flow rate (for liquid blowdown only)
-        n_dot = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_l))
-        
-        # set up Ax=b system, where dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
-        A = np.array([
-            [1, 1, 0], 
-            [v_v, v_l, n_v * d_v_v_d_T_T + n_l * d_v_l_d_T_T],
-            [u_v, u_l, n_v * d_u_v_d_T_T + n_l * d_u_l_d_T_T]
-        ])
-        b = np.array([-n_dot, 0, -n_dot * h_o])
-        
-        # solve and assign values to the time derivative state vector
-        x = np.linalg.solve(A, b)
-        dn_v_dt, dn_l_dt, dT_T_dt = x
-        dx_dt[1] = dn_v_dt
-        dx_dt[2] = dn_l_dt
-        dx_dt[3] = dT_T_dt
-        
-    else: # Gaseous blowdown, solve Ax=b system but different
-        # polytropic exponent, approximated as the heat capacity ratio (m = heat capacity at constant pressure of vapor / heat capacity at constant volume of vapor)
-        m = get_N2O_property("c_p_v", T_T, N2O_properties_dict) / get_N2O_property("c_v_v", T_T, N2O_properties_dict)
-        
-        # solve for the quantities dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
-        dn_v_dt = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_v))
-        dn_l_dt = 0
-        dT_T_dt = T_T * (m-1) * dn_v_dt / n_v
-        
-        # assign values to the time derivative state vector
-        dx_dt[1] = dn_v_dt
-        dx_dt[2] = dn_l_dt
-        dx_dt[3] = dT_T_dt
-    
-    
-    # ==========================================================
-    # ========== CV2: Combustion chamber calculations ==========
-    # ==========================================================
-    
-    # in this section, the following quantities are calculated:
-    # x = [r_f, m_o, m_f, p_C]
-    
-    # r_f
-    if r_f > 1e-10: # might be smaller than ideal
-        dr_f_dt = a * ((W_o * n_dot)/(np.pi * r_f**2)) ** n
-    else:
-        dr_f_dt = 0
-    
-    # m_o and m_f
-    OF = m_o / m_f # oxidizer to fuel ratio
-    dm_n_dt = dm_o_out_dt + dm_f_out_dt # Nozzle total propellant mass flow rate
-    
-    dm_o_in_dt = W_o * n_dot
-    dm_o_out_dt = dm_n_dt / (1+1/OF)
-    dm_o_dt = dm_o_in_dt - dm_o_out_dt
-    
-    dm_f_in_dt = p_f * 2 * np.pi * r_f * L_f * dr_f_dt
-    dm_f_out_dt = dm_n_dt / (1+OF)
-    dm_f_dt = dm_f_in_dt - dm_f_out_dt
-    
-    # p_C
-    
-    
-    # assign calculated values to the time derivative state vector
-    dx_dt[4] = dr_f_dt
-    dx_dt[5] = dm_o_dt
-    dx_dt[6] = dm_f_dt
-    
-    # ==============================================
-    # ========== CV3: Nozzle calculations ==========
-    # ==============================================
-    
-    
-    
-    
-    # ===================================================
-    # ========== CV4: Rocket body calculations ==========
-    # ===================================================
-    
-    
-    
-    
-    # ==================================
-    # ==== Compute new state vector ====
-    # ==================================
-    
-    x[1] = dx_dt[1] * dt
-    x[2] = dx_dt[2] * dt
-    x[3] = dx_dt[3] * dt
-    x[4] = dx_dt[4] * dt
-    x[5] = dx_dt[5] * dt
-    x[6] = dx_dt[6] * dt
-    x[7] = dx_dt[7] * dt
-    x[8] = dx_dt[8] * dt
-    x[9] = dx_dt[9] * dt
-    x[10] = dx_dt[10] * dt
-        
-    return
+        # ============================================
+        # ========== CV1: Tank calculations ==========
+        # ============================================
+
+        # in this section, the following quantities are calculated:
+        # x = [n_v, n_l, T_T]
+
+        # For the tank, there are two cases: liquid blowdown (n_l>0; there is liquid in the tank) and gaseous blowdown (n_l=0; there is only vapor in the tank)
+        if n_l > 1e-10: # Liquid-vapor blowdown; pick a number slightly above 0 so the simulation doesn't stall
+            # get N2O properties from lookup table
+            d_v_v_d_T_T = get_N2O_property("d_v_v/d_T", T_T, N2O_properties_dict) # vapor molar volume with respect to temperature [m^3/(mol-K)]
+            d_v_l_d_T_T = get_N2O_property("d_v_l/d_T", T_T, N2O_properties_dict) # liquid molar volume with respect to temperature [m^3/(mol-K)]
+            u_v = get_N2O_property("u_v", T_T, N2O_properties_dict) # vapor internal energy [J/mol]
+            u_l = get_N2O_property("u_l", T_T, N2O_properties_dict) # liquid internal energy [J/(mol-K)]
+            d_u_l_d_T_T = get_N2O_property("d_u_l/d_T", T_T, N2O_properties_dict) # liquid internal energy with respect to temperature [J/(mol-K)]
+            d_u_v_d_T_T = get_N2O_property("d_u_v/d_T", T_T, N2O_properties_dict) # vapor internal energy with respect to temperature [J/(mol-K)]
+            h_o = get_N2O_property("h_l", T_T, N2O_properties_dict) # Oxidizer molar enthalpy (for liquid oxidizer)
+
+            # oxidizer molar flow rate (for liquid blowdown only)
+            n_dot = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_l))
+
+            # set up Ax=b system, where dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
+            A = np.array([
+                [1, 1, 0], 
+                [v_v, v_l, n_v * d_v_v_d_T_T + n_l * d_v_l_d_T_T],
+                [u_v, u_l, n_v * d_u_v_d_T_T + n_l * d_u_l_d_T_T]
+            ])
+            b = np.array([-n_dot, 0, -n_dot * h_o])
+
+            # solve and assign values to the time derivative state vector
+            x = np.linalg.solve(A, b)
+            dn_v_dt, dn_l_dt, dT_T_dt = x
+            dx_dt[1] = dn_v_dt
+            dx_dt[2] = dn_l_dt
+            dx_dt[3] = dT_T_dt
+
+        else: # Gaseous blowdown, solve Ax=b system but different
+            # polytropic exponent, approximated as the heat capacity ratio (m = heat capacity at constant pressure of vapor / heat capacity at constant volume of vapor)
+            m = get_N2O_property("c_p_v", T_T, N2O_properties_dict) / get_N2O_property("c_v_v", T_T, N2O_properties_dict)
+
+            # solve for the quantities dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
+            dn_v_dt = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_v))
+            dn_l_dt = 0
+            dT_T_dt = T_T * (m-1) * dn_v_dt / n_v
+
+            # assign values to the time derivative state vector
+            dx_dt[1] = dn_v_dt
+            dx_dt[2] = dn_l_dt
+            dx_dt[3] = dT_T_dt
+
+
+        # ==========================================================
+        # ========== CV2: Combustion chamber calculations ==========
+        # ==========================================================
+
+        # in this section, the following quantities are calculated:
+        # x = [r_f, m_o, m_f, p_C]
+
+        # r_f
+        if r_f > 1e-10: # might be smaller than ideal
+            dr_f_dt = a * ((W_o * n_dot)/(np.pi * r_f**2)) ** n
+        else:
+            dr_f_dt = 0
+
+        # m_o and m_f
+        OF = m_o / m_f # oxidizer to fuel ratio
+        dm_n_dt = dm_o_out_dt + dm_f_out_dt # Nozzle total propellant mass flow rate
+
+        dm_o_in_dt = W_o * n_dot
+        dm_o_out_dt = dm_n_dt / (1+1/OF)
+        dm_o_dt = dm_o_in_dt - dm_o_out_dt
+
+        dm_f_in_dt = p_f * 2 * np.pi * r_f * L_f * dr_f_dt
+        dm_f_out_dt = dm_n_dt / (1+OF)
+        dm_f_dt = dm_f_in_dt - dm_f_out_dt
+
+        # p_C
+
+
+        # assign calculated values to the time derivative state vector
+        dx_dt[4] = dr_f_dt
+        dx_dt[5] = dm_o_dt
+        dx_dt[6] = dm_f_dt
+
+        # ==============================================
+        # ========== CV3: Nozzle calculations ==========
+        # ==============================================
 
 
 
+
+        # ===================================================
+        # ========== CV4: Rocket body calculations ==========
+        # ===================================================
+
+
+
+
+        # ==================================
+        # ==== Compute new state vector ====
+        # ==================================
+
+        x[1] = dx_dt[1] * dt
+        x[2] = dx_dt[2] * dt
+        x[3] = dx_dt[3] * dt
+        x[4] = dx_dt[4] * dt
+        x[5] = dx_dt[5] * dt
+        x[6] = dx_dt[6] * dt
+        x[7] = dx_dt[7] * dt
+        x[8] = dx_dt[8] * dt
+        x[9] = dx_dt[9] * dt
+        x[10] = dx_dt[10] * dt
+        
+        update_state_vector(x, state_vector)
+
+    return state_vector
+
+
+
+# updates the state vector by applying each field in input vector x to the correct place in the state_vector dict
+def update_state_vector(x, state_vector):
+    state_vector["time"].append(x[0])
+    state_vector["n_v"].append(x[1])
+    state_vector["n_l"].append(x[2])
+    state_vector["T_T"].append(x[3])
+    state_vector["r_f"].append(x[4])
+    state_vector["m_o"].append(x[5])
+    state_vector["m_f"].append(x[6])
+    state_vector["p_C"].append(x[7])
+    state_vector["z_R"].append(x[8])
+    state_vector["v_R"].append(x[9])
+    state_vector["a_R"].append(x[10])
