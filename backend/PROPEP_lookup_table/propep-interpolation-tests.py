@@ -22,6 +22,6 @@ class PROPEP_test:
         print(base_heat_ratio, interp_heat_ratio, partial_heat_ratio)
         
 
-
+test0 = PROPEP_test(1, 14.7)
 test1 = PROPEP_test(5, 600)
 test2 = PROPEP_test(10, 1000)

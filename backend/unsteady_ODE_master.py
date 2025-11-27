@@ -2,24 +2,66 @@ from unsteady_N2O_properties import get_N2O_property
 import numpy as np
 
 # do all the computationally expensive one-time setup stuff here, before passing it off to ODE_master
-def setup_ODE_master(rocket_inputs, constants_dict):
-    # unpack rocket inputs
-    # Tank
-    # Chamber
-    a = rocket_inputs["regression rate scaling coefficient"]
-    n = rocket_inputs["regression rate exponent"]
-    W_o = rocket_inputs["oxidizer molar weight"]
+# caching in particular ensures we are only passing the necessary inputs along to ODE_master
+def setup_ODE_master(rocket_inputs, constants_dict, state_vector):
+    # Rocket (body)
+    m_dry = rocket_inputs["rocket dry mass"]
+    C_d = rocket_inputs["rocket drag coefficient"]
+    A_R = rocket_inputs["rocket frontal area"]
+    theta = rocket_inputs["rocket launch angle"]
+    
+    # Parachutes
+    C_d_drogue = rocket_inputs["drogue parachute drag coefficient"]
+    A_drogue = rocket_inputs["drogue parachute frontal area"]
+    H_deployment = rocket_inputs["main parachute deployment altitude"] # might rename, listed as "-" in Joel's model
+    C_d_main = rocket_inputs["main parachute drag coefficient"]
+    A_main = rocket_inputs["main parachute frontal area"]
+    
+    # Oxidizer tank
+    m_o_tot = rocket_inputs["tank oxidizer mass"]
+    T_T_0 = rocket_inputs["tank temperature"]
+    p_T_0 = rocket_inputs["tank pressure"]
+    d_T = rocket_inputs["tank internal diameter"]
+    L_T = rocket_inputs["tank internal shell length"]
+    V_T = rocket_inputs["tank internal volume"]
+    U = rocket_inputs["tank ullage factor"]
+    
+    # Dip tube
+    D_dt = rocket_inputs["dip tube external diameter"]
+    d_dt = rocket_inputs["dip tube internal diameter"]
+    L_dt = rocket_inputs["dip tube length"]
+    
+    # Injector and feed
     C_i = rocket_inputs["injector discharge coefficient"]
     N_i = rocket_inputs["injector number of holes"]
     A_i = rocket_inputs["injector hole area"]
-    # Nozzle
-    # Rocket
+    p_loss = rocket_inputs["feed pressure loss"]
     
-    # unpack physical constants
+    # Chamber
+    m_f_tot = rocket_inputs["chamber fuel mass"]
+    L_f = rocket_inputs["chamber fuel length"]
+    p_f = rocket_inputs["chamber fuel density"]
+    R_f = rocket_inputs["chamber fuel external radius"]
+    a = rocket_inputs["chamber regression rate scaling constant"]
+    n = rocket_inputs["chamber regression rate exponent"]
+    V_pre = rocket_inputs["pre-chamber volume"]
+    V_post = rocket_inputs["post-chamber volume"]
+    
+    # Nozzle 
+    r_t = rocket_inputs["nozzle throat radius"]
+    r_e = rocket_inputs["nozzle exit radius"]
+    
+    # Constants
     g = constants_dict["sea level gravity"]
-    R_u = constants_dict[""]
+    R_u = constants_dict["universal gas constant"]
+    W_o = constants_dict["nitrous oxide molar mass"]
+    # ... more to be added
     
-    cached_data = () # all variables will be lacked into here to then be quickly unpacked
+    # Other
+    dt = rocket_inputs["timestep length"]
+    
+    # pack up all variables
+    cached_data = (state_vector, dt, m_dry, C_d, A_R, theta, C_d_drogue, A_drogue, H_deployment, C_d_main, A_main, m_o_tot, T_T_0, p_T_0, d_T, L_T, V_T, U, D_dt, d_dt, L_dt, C_i, N_i, A_i, p_loss, m_f_tot, L_f, p_f, R_f, a, n, V_pre, V_post, r_t, r_e, g, R_u, W_o)
     
     return cached_data
 
@@ -29,7 +71,9 @@ def ODE_master(cached_data, state_vector):
     # ========== Unpack cached data ==========
     # ========================================
     
-    (x, dicts, dt, v_l, v_v, p_T, p_loss, C_i, N_i, A_i, W_o, a, n, p_f, L_f, A_t) = cached_data # there will be more stuff in the paratheses
+    (x, dt, m_dry, C_d, A_R, theta, C_d_drogue, A_drogue, H_deployment, C_d_main, A_main, m_o_tot, T_T_0, p_T, d_T, L_T, V_T, U, D_dt, d_dt, L_dt, C_i, N_i, A_i, p_loss, m_f_tot, L_f, p_f, R_f, a, n, V_pre, V_post, r_t, r_e, g, R_u, W_o) = cached_data
+    
+    # calculate nozzle throat area
     
     # x is the state vector, also needs to be unpacked (need to verify units)
         # n_v = moles of N2O vapor in the tank [mol]
@@ -44,28 +88,8 @@ def ODE_master(cached_data, state_vector):
         # a_R = rocket acceleration [m/s^2]
     (time, n_v, n_l, T_T, r_f, m_o, m_f, p_C, z_R, v_R, a_R) = x
     
-    # other variables
-        # dt: timestep length
-        # v_l: Oxidizer liquid molar volume
-        # v_v: Oxidizer vapor molar volume
-        # p_T
-        # p_loss
-        # C_i, N_i, A_i: injector flow coefficient, number of holes, and area per hole
-        # a: regresion rate scaling constant
-        # W_o: Oxidizer molar weight
-        # n: Regression rate exponent
-        # p_f: Fuel density
-        # L_f: fuel cell length
-        # A_t: nozzle throat area
-        
-    # unpack dicts; these serve as lookup tables
-    (N2O_properties_dict, PROPEP_lookup_dict) = dicts
-    
     # create a time derivative state vector, with values to be filled in during the following calculations
     dx_dt = [time, 0,0,0,0,0,0,0,0,0,0]
-    
-    
-    
     
     ########################
     # ODE while loop:
@@ -77,17 +101,21 @@ def ODE_master(cached_data, state_vector):
 
         # in this section, the following quantities are calculated:
         # x = [n_v, n_l, T_T]
-
+        
+        # get N2O property 
+        v_v = get_N2O_property("v_v", T_T)
+        v_l = get_N2O_property("v_l", T_T)
+        
         # For the tank, there are two cases: liquid blowdown (n_l>0; there is liquid in the tank) and gaseous blowdown (n_l=0; there is only vapor in the tank)
         if n_l > 1e-10: # Liquid-vapor blowdown; pick a number slightly above 0 so the simulation doesn't stall
             # get N2O properties from lookup table
-            d_v_v_d_T_T = get_N2O_property("d_v_v/d_T", T_T, N2O_properties_dict) # vapor molar volume with respect to temperature [m^3/(mol-K)]
-            d_v_l_d_T_T = get_N2O_property("d_v_l/d_T", T_T, N2O_properties_dict) # liquid molar volume with respect to temperature [m^3/(mol-K)]
-            u_v = get_N2O_property("u_v", T_T, N2O_properties_dict) # vapor internal energy [J/mol]
-            u_l = get_N2O_property("u_l", T_T, N2O_properties_dict) # liquid internal energy [J/(mol-K)]
-            d_u_l_d_T_T = get_N2O_property("d_u_l/d_T", T_T, N2O_properties_dict) # liquid internal energy with respect to temperature [J/(mol-K)]
-            d_u_v_d_T_T = get_N2O_property("d_u_v/d_T", T_T, N2O_properties_dict) # vapor internal energy with respect to temperature [J/(mol-K)]
-            h_o = get_N2O_property("h_l", T_T, N2O_properties_dict) # Oxidizer molar enthalpy (for liquid oxidizer)
+            d_v_v_d_T_T = get_N2O_property("d_v_v/d_T", T_T) # vapor molar volume with respect to temperature [m^3/(mol-K)]
+            d_v_l_d_T_T = get_N2O_property("d_v_l/d_T", T_T) # liquid molar volume with respect to temperature [m^3/(mol-K)]
+            u_v = get_N2O_property("u_v", T_T) # vapor internal energy [J/mol]
+            u_l = get_N2O_property("u_l", T_T) # liquid internal energy [J/(mol-K)]
+            d_u_l_d_T_T = get_N2O_property("d_u_l/d_T", T_T) # liquid internal energy with respect to temperature [J/(mol-K)]
+            d_u_v_d_T_T = get_N2O_property("d_u_v/d_T", T_T) # vapor internal energy with respect to temperature [J/(mol-K)]
+            h_o = get_N2O_property("h_l", T_T) # Oxidizer molar enthalpy (for liquid oxidizer)
 
             # oxidizer molar flow rate (for liquid blowdown only)
             n_dot = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_l))
@@ -109,7 +137,7 @@ def ODE_master(cached_data, state_vector):
 
         else: # Gaseous blowdown, solve Ax=b system but different
             # polytropic exponent, approximated as the heat capacity ratio (m = heat capacity at constant pressure of vapor / heat capacity at constant volume of vapor)
-            m = get_N2O_property("c_p_v", T_T, N2O_properties_dict) / get_N2O_property("c_v_v", T_T, N2O_properties_dict)
+            m = get_N2O_property("c_p_v", T_T) / get_N2O_property("c_v_v", T_T)
 
             # solve for the quantities dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
             dn_v_dt = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_v))

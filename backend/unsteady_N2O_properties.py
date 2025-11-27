@@ -56,9 +56,10 @@ def initialize_N2O_properties_dict():
     
     return N2O_properties_dict
 
+N2O_properties_dict = initialize_N2O_properties_dict()
 
 # returns property_name interpolated at tank_temp for any property_name in N2O_properties_dict
-def get_N2O_property(property_name, tank_temp, N2O_properties_dict):
+def get_N2O_property(property_name, tank_temp, N2O_properties_dict=N2O_properties_dict):
     # throw error if tank_temp is outside the data range
     if tank_temp < 183 or tank_temp > 309:
         raise ValueError("Tank temperature out of valid range (183 K to 309 K)")

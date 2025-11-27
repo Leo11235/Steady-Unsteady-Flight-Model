@@ -80,9 +80,22 @@ def initialize_state_vector(rocket_inputs, N2O_properties_dict, constants_dict):
     v_R = 0 # velocity
     a_R = 0 # acceleration
     
-    # first 0 is time
-    return (0, n_v, n_l, T_T_0, r_f, m_o, m_f, p_C, z_R, v_R, a_R)
-
+    return {
+        'time': [0],
+        # CV1: tank
+        'n_v': [n_v], # moles of N2O in vapor phase the tank
+        'n_l': [n_l], # moles of N2O in liquid phase the tank
+        'T_T': [T_T_0], # tank temperature
+        # CV2: combustion chamber
+        'r_f': [r_f], # fuel cell internal radius
+        'm_o': [m_o], # oxidizer mass in the combustion chamber
+        'm_f': [m_f], # fuel mass in the combustion chamber
+        'p_C': [p_C], # combustion chamber pressure
+        # CV4: entire rocket (might split into horizontal and vertical components)
+        'z_R': [z_R], # rocket altitude
+        'v_R': [v_R], # rocket total velocity
+        'a_R': [a_R], # vertical acceleration
+    }
 
 # uses tank ullage factor to initialize the state vector, returns state vector at t=0
 def initialize_state_vector_using_ullage(rocket_inputs, v_l, v_v, m_o_tot_0, W_o, d_T, D_dt, d_dt):

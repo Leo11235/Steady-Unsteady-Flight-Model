@@ -180,8 +180,9 @@ def ODE_master(cached_data, state_vector):
         # ===================================================
         # ========== CV4: Rocket body calculations ==========
         # ===================================================
-
-
+        
+        # in this section, the following quantities are calculated:
+        # x = [z_R, v_R, a_R]
 
 
         # ==================================
