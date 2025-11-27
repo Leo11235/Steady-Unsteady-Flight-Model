@@ -152,7 +152,7 @@ def ODE_master(cached_data, state_vector):
 
         # p_C
         # get PROPEP values and PROPEP partial derivatives
-        T_c, W_c, gamma, dT_dOF, dW_dOF, dT_dp, dW_dp = get_chamber_properties_with_partials(p_C, OF)
+        T_c, W_c, gamma, dT_dOF, dW_dOF, dT_dp, dW_dp = get_chamber_properties_with_partials(OF, p_C)
         # chamber gaseous mass storage & its derivative w.r.t. time
         m_c = m_o + m_f
         dm_c_dt = dm_o_in_dt + dm_f_in_dt - dm_n_dt

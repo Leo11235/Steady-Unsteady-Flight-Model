@@ -152,7 +152,7 @@ def plot_surface_multiindex_numeric(df, z_col):
 #to check if the increments are too large
 #plot_surface_multiindex_numeric(ppp_df_loaded, "molar_weight")
 
-def get_chamber_properties_with_partials(p_C, OF, delta_OF=0.01, delta_p=1):
+def get_chamber_properties_with_partials(OF, p_C, delta_OF=0.01, delta_p=1):
     # get base values
     T_base, W_base, gamma_base = pyPROPEP_interpolation_lookup(OF, p_C, lookup_table=ppp_df_loaded)
     
