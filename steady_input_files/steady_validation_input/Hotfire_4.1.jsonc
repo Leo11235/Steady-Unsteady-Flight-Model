@@ -21,7 +21,7 @@
         "target apogee": 13716, // m
 
         "oxidizer mass flow rate": 0.951, // kg/s
-        "chamber pressure": 4635345, // Pa
+        "chamber pressure": 1172257, // Pa
         "fuel external radius": 0.0428625, // m
         "initial internal fuel radius": 0.032004, // m; only used for hotfire tests
         "fuel length": 0.6096, // m
