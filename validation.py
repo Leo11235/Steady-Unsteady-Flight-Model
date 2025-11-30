@@ -1,7 +1,7 @@
 import json
 import matplotlib.pyplot as plt
 import numpy as np
-from backend.steady_main import main, print_dict
+from backend.steady_main import get_rocket_inputs, run_with_inputs
 
 arr = ["2.2", "2.3", "2.4", "2.6", "2.7", "3.1", "3.4", "3.5", "4.1"]
 start_arr =    [0, 0, 0, 0, 0, 22.75, 9, 5.63, 5]
@@ -115,8 +115,11 @@ if __name__ == "__main__":
         if (not arr[i] in cur_valid): continue
         if (arr[i] != "3.1"): continue
         p = f"validation/hotfires/hotfire_processed/HOTFIRE{arr[i]}.jsonc"
-        steady_dic = main(f"steady_input_files/Hotfire_{arr[i]}.jsonc")
+
         hotfire_results = graph_all(p, i)
+        steady_input = get_rocket_inputs(f"steady_input_files/Hotfire_{arr[i]}.jsonc")
+        steady_input['chamber pressure'] = hotfire_results['avg_cc_pressure'] / 0.00014504 # psi to pascal
+        steady_dic = run_with_inputs(steady_input)
         steady_results = graph_steady(steady_dic, i)
         # plt.show()
 
