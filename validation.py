@@ -35,16 +35,17 @@ def graph_all (path, J):
         if (len(sec) != len(dic_data[k])):
             print(f"{path} + key {k} has length {len(dic_data[k])}")
             continue
-        plt.figure(k)
+
         if (k == "thrust"): graph_thrust(path, sec, dic_data[k], dic, J)
         elif (k == "cc_pressure"): graph_pressure(path, sec, dic_data[k], dic, J)
     return dic
 
 def graph_pressure (path, sec, pressure, dic, J):
-    plt.xlabel('seconds')
-    plt.ylabel('cc_pressure')
-    plt.plot(sec, pressure) #adjusted thrust so it starts and ends ~0N
-    plt.title(path + ' cc_pressure graph')
+    # plt.figure('cc_pressure')
+    # plt.xlabel('seconds')
+    # plt.ylabel('cc_pressure')
+    # plt.plot(sec, pressure) #adjusted thrust so it starts and ends ~0N
+    # plt.title(path + ' cc_pressure graph')
 
     avg_cc_pressure = 0
     for i in range(len(pressure) - 1): 
@@ -57,6 +58,7 @@ def graph_pressure (path, sec, pressure, dic, J):
 
 
 def graph_thrust (path, sec, dict_k, dic, J):
+    plt.figure('thrust')
     plt.xlabel('seconds')
     plt.ylabel('thrust')
     plt.plot([sec[0], sec[-1]], [0, 0])
@@ -113,7 +115,7 @@ if __name__ == "__main__":
     cur_valid = list(["3.1", "3.2", "3.4", "3.5", "4.1"]);
     for i in range(len(arr)):
         if (not arr[i] in cur_valid): continue
-        if (arr[i] != "3.1"): continue
+        if (arr[i] != "4.1"): continue
         p = f"validation/hotfires/hotfire_processed/HOTFIRE{arr[i]}.jsonc"
 
         hotfire_results = graph_all(p, i)
@@ -121,9 +123,9 @@ if __name__ == "__main__":
         steady_input['chamber pressure'] = hotfire_results['avg_cc_pressure'] / 0.00014504 # psi to pascal
         steady_dic = run_with_inputs(steady_input)
         steady_results = graph_steady(steady_dic, i)
-        # plt.show()
 
         print(f"HOTFIRE:\n\tavg_cc_pressure = {hotfire_results['avg_cc_pressure']}\n\tburntime: {hotfire_results['burntime']}\n\tpeak_thrust = {hotfire_results['max_thrust']}\n\tavg_thrust = {hotfire_results['avg_thrust']}\n\ttotal_impulse = {hotfire_results['total_impulse']}")
         print(f"Steady Simulation:\n\tburntime: {steady_results['burntime']}\n\tavg_thrust = {steady_results['avg_thrust']}\n\ttotal_impulse = {steady_results['total_impulse']}")
+        plt.show()
 
 
