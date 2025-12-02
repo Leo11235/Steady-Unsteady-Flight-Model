@@ -1,5 +1,6 @@
 from unsteady_N2O_properties import get_N2O_property
 import numpy as np
+from scipy.optimize import fsolve
 from PROPEP_lookup_table.pyPROPEP_simple import get_chamber_properties_with_partials, pyPROPEP_interpolation_lookup
 
 # do all the computationally expensive one-time setup stuff here, before passing it off to ODE_master
@@ -173,6 +174,139 @@ def ODE_master(cached_data, state_vector):
         # ==============================================
         # ========== CV3: Nozzle calculations ==========
         # ==============================================
+
+        # Get M1
+
+        term1 = (2 / (gamma + 1)) * (1 + (gamma - 1) / 2 * M_1**2) #Eq 3.33
+        term2 = (gamma + 1) / (2 * (gamma - 1)) #eq. 3.33
+
+        eq_3pt33 = (1 / M_1) * term1**term2
+        M_1 = fsolve(eq_3pt33, 0.5)[0] # First element of the Numpy Array
+
+        # Get p1
+
+        term3 = (1+((gamma-1)/2)*(M_1)**2) #Every terms in the brackets of eq. 3.34
+        term4 = (gamma/(gamma - 1))
+        p_1 = p_C*(term3**term4)
+
+        # Get M2x
+
+        term5 = (2 / (gamma + 1)) * (1 + (gamma - 1) / 2 * M_2x**2) #Replace M2x into Eq 3.33
+        term6 = (gamma + 1) / (2 * (gamma - 1)) #Replace M2x into eq. 3.33
+
+        eq_3pt34 = (1 / M_2x) * term5**term6
+        M_2x = fsolve(eq_3pt34, 0.5)[0] #First element of the Numpy Array
+
+        # Get p2x
+
+        term7 = (1+((gamma-1)/2)*(M_2x)**2) #Every terms in the brackets of eq. 3.34
+        term8 = (gamma/(gamma - 1))
+        p_2x = p_C*(term3**term4)
+
+        #Get p_2
+
+        top_3pt37 = 2*gamma*((M_2x)**2)- (gamma - 1)
+        bottom_3pt37 = (gamma +1)
+        p_2 = p_2x ( top_3pt37/bottom_3pt37)
+
+        # Get M_2
+
+        top_3pt38 = 2+ (gamma -1)((M_2x)**2)
+        bottom_3pt38 = 2*gamma*((M_2x)**2)-(gamma-1)
+        M_2 = sqrt(top_3pt38/bottom_3pt38)
+
+        if p_amb >= p_1:
+            p_e = p_amb
+            if p_amb = p_1: # Case where the flow is choked
+                M_t =1
+                M_e = M_1
+            elif p_amb > p_1: # Case where the flow is subsonic through the nozzle
+                #Get M_e
+
+                bracket_3pt35 = (1+((gamma-1)/2)*(M_e)**2) #Every terms in the brackets of eq. 3.34
+                exp_3pt35 = (gamma/(gamma - 1))
+                
+                eq_3pt35 = bracket_3pt35**exp_3pt35 - (p_C/p_e)
+                M_e = fsolve(eq_3pt35, 0.5)
+
+                #Get M_t
+
+                top_3pt36 = 1+((gamma-1)/2)*(M_t**2)
+                bottom_3pt36 = 1+((gamma-1)/2)*(M_e**2)
+                exp_3pt36 = (gamma+1)/(2(gamma-1))
+                eq_3pt36 = (M_e/M_t)*(top_3pt36/bottom_3pt36)**(exp_3pt36) - (A_t/A_e)
+
+       if (p_1 > p_amb) and (p_amb >= p_2):
+        p_e = p_amb
+        M_t =1 #Flow is choked
+
+        if p_2 = p_amb:
+            M_e = M_2
+
+        elif p_2 > p_amb:
+            bracket_3pt40 = (2/(gamma-1))*(1+((gamma-1)/2)*(M_e)**2)
+            exp_3pt40 = (gamma+1) /(2*(gamma-1))
+            eq_3pt40 = (1/M_e)*(bracket_3pt40)**(exp_3pt40) - (A_e/A_t)
+
+            M_e = fsolve(eq_3pt40, 0.5)
+        
+
+        #Engine trust
+
+        #Get T_e 
+
+        rhs_3pt43 = 1 + ((gamma-1)/2)*(M_e)**2
+        T_e = T_c/rhs_3pt43
+
+        #Get v_e
+
+        v_e = M_e* sqrt((gamma* R_u * T_e)/W_c)
+
+        #Get m_dot_n
+
+        exp_3pt44 = -(gamma+1)/(2(gamma-1))
+
+        m_dot_n = A_t*p_C*M_t* sqrt((gamma* W_c)/R_u * T_e) * (1+ (((gamma-1)/2))*(M_t)**2)**exp_3pt44
+
+        #Trust
+        F = m_dot_n * v_e + (p_e - p_amb)*A_e
+
+        
+
+
+
+
+
+
+
+
+            
+
+
+
+
+
+
+        
+
+
+        
+
+                
+        
+        
+
+
+
+
+
+
+
+
+
+    
+
+
 
 
 
