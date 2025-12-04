@@ -1,5 +1,9 @@
 from unsteady_N2O_properties import get_N2O_property
+from PROPEP_lookup_table.pyPROPEP_simple import get_chamber_properties_with_partials
+from unsteady_rocket_ascent import calculate_ambient_pressure
 import numpy as np
+from scipy.optimize import fsolve
+
 
 # do all the computationally expensive one-time setup stuff here, before passing it off to ODE_master
 # caching in particular ensures we are only passing the necessary inputs along to ODE_master
@@ -176,18 +180,111 @@ def ODE_master(cached_data, state_vector):
         dm_f_dt = dm_f_in_dt - dm_f_out_dt
 
         # p_C
-
+        # get PROPEP values and PROPEP partial derivatives
+        T_c, W_c, gamma, dT_dOF, dW_dOF, dT_dp, dW_dp = get_chamber_properties_with_partials(OF, p_C)
+        # chamber gaseous mass storage & its derivative w.r.t. time
+        m_c = m_o + m_f
+        dm_c_dt = dm_o_in_dt + dm_f_in_dt - dm_n_dt
+        # OF ratio derivative w.r.t. time
+        dOF_dt = (1/m_f)*(dm_o_dt - OF*dm_f_dt)
+        # chamber volume & its derivative w.r.t. time
+        V_c = V_pre + V_post + np.pi * r_f**2 * L_f
+        dV_c_dt = 2* np.pi * r_f * dr_f_dt * L_f
+        # finally, actually calculate p_C
+        dp_C_dt = (dm_c_dt/m_c - dV_c_dt/V_c + dOF_dt(dT_dOF/T_c + dW_dOF/W_c)) / (1/p_C - dT_dp/T_c + dW_dp/W_c)
 
         # assign calculated values to the time derivative state vector
         dx_dt[4] = dr_f_dt
         dx_dt[5] = dm_o_dt
         dx_dt[6] = dm_f_dt
+        dx_dt[7] = dp_C_dt
 
         # ==============================================
         # ========== CV3: Nozzle calculations ==========
         # ==============================================
+        
+        p_amb = calculate_ambient_pressure(z_R)
+        
+        # M_1, the subsonic exit mach when the nozzle throat is choked (required to find p_1)
+        def eq_M1(M, gamma, A_ratio):
+            term1 = (2 / (gamma + 1)) * (1 + (gamma - 1) / 2 * M**2)
+            term2 = (gamma + 1) / (2 * (gamma - 1))
+            return (1 / M) * term1**term2 - A_ratio
 
-
+        A_e = np.pi * r_e**2 # nozzle exit area
+        A_t = np.pi * r_t**2 # nozzle throat area
+        A_ratio = A_e / A_t # nozzle area ratio
+        
+        # M_1, the first critical nozzle mach number
+        M_1 = fsolve(lambda M: eq_M1(M, gamma, A_ratio), 0.5)[0] # solve for M_1 with initial guess <1
+        # M_2x, the supersonic exit mach just before the shockwave (required to find p_2)
+        M_2x = fsolve(lambda M: eq_M1(M, gamma, A_ratio), 2.0)[0] # solve for M_2x with initial guess >1
+        
+        # p_1, first critical pressure
+        p_1 = p_C / ((1 + (gamma - 1) / 2 * M_1**2) ** (gamma / (gamma - 1)))
+        # p_2x, the second critical pressure right before the shockwave
+        p_2x = p_C / ((1 + (gamma - 1) / 2 * M_2x**2) ** (gamma / (gamma - 1)))
+        # p_2, second critical pressure
+        p_2 = p_2x * ((2 * gamma * M_2x**2 - (gamma - 1)) / (gamma + 1))
+        
+        # M_2
+        M_2 = np.sqrt((2+(gamma-1) * M_2x**2) / (2*gamma*M_2x**2-(gamma-1)))
+        
+        # determine the flow regime
+        if p_2 >= p_1: # first, detect physical impossibility
+            raise Exception("Nozzle flow regimes not regiming (p_2 >= p_1; shouldn't happen)")
+        TOLERANCE = 1e-6 # might be too small, idk
+        # case 1: p_ambient = p_1
+        if abs(p_amb - p_1) < TOLERANCE:
+            p_e = p_amb
+            M_t = 1
+            M_e = M_1
+        # case 2: p_ambient = p_2
+        elif abs(p_amb - p_1) < TOLERANCE:
+            p_e = p_amb
+            M_t = 1
+            M_e = M_2
+        # case 3: fully supersonic, underexpanded nozzle
+        elif p_amb < p_2:
+            p_e = p_2x
+            M_t = 999 # ?????????? idk what to put here
+            M_e = M_2x
+        # case 4
+        elif p_2 < p_amb < p_1:
+            p_e = p_amb
+            M_t = 1
+            M_e = 999 # use equations 3.39-3.42
+        # case 5
+        elif p_amb > p_1:
+            p_e = p_amb
+            M_t, M_e = 999 # use equations 3.35-3.36
+        # if no case (should never happen, even when the physics aren't working)
+        else: 
+            raise Exception("Nozzle flow regime logic error")
+        
+        
+        # case 1
+        if p_amb >= p_1: # diverging section of the nozzle is fully subsonic 
+            M_e = 999
+            M_t = 999
+            p_e = p_amb
+        # case 2
+        elif p_1 > p_amb >= p_2: # flow is choked at the throat (M_t = 1), and there is a normal standing showckwave in the diverging section of the nozzle
+            M_e = 999
+            M_t = 1
+            p_e = p_amb
+        # case 3
+        elif p_amb < p_2: # nozzle throat is choked and the diverging section of the nozzle is supersonic (no shockwave)
+            M_e = M_2x
+            M_t = 1
+            p_e = p_2x
+        else:
+            raise Exception("Nozzle flow regimes not regiming (shouldn't happen)")
+        
+        # M_e, the actual mach number (required to calculate exhaust exist velocity)
+        # M_t, the throat mach number (used to calculate mass flow rate)
+        # v_e, exhaust exist velocity
+        # dm_n_dt, propellant mass flow rate
 
 
         # ===================================================
