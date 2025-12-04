@@ -295,7 +295,7 @@ def ODE_master(cached_data, state_vector):
         dm_R_dt = -dm_n_dt              #conservation of mass ODE from 2.16
         dz_R_dt = v_R * np.cos(theta)   #altitude ODE from 2.17
 
-        rho_a = calculate_air_density(z_R)      # air density from unsteady_rocket_ascent
+        rho_a = calculate_air_density(z_R)      #air density from unsteady_rocket_ascent
         g_z = g * (r_E / (r_E + z_R))**2        #gravitational acceleration from 2.21
         D = 0.5 * C_d * A_R * rho_a * v_R**2    #drag force from 2.19
 
