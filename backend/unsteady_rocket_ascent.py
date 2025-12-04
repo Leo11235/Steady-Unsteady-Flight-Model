@@ -17,3 +17,7 @@ def calculate_air_density(constants_dict, height):
         p_air = p11 * e ** ((11000 - height)*(g*M/(Ru*T11)))
 
     return p_air
+
+# returns ambient pressure at rocket_height
+def calculate_ambient_pressure(constants_dict, rocket_height):
+    return
