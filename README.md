@@ -1,10 +1,12 @@
 # McGill Rocket Team Steady-Unsteady-Flight-Model
 
-This repository contains the computational models (Steady-State and Unsteady) for the nitrous oxide/paraffin wax hybrid rocket engine.
+### Steady-State and Unsteady Models for Nitrous Oxide/Paraffin Wax Hybrid Rocket Engine
+
+This repository contains the computational framework developed by the McGill Rocket Team (MRT) to model, simulate, and optimize the performance of a self-pressurizing hybrid rocket engine using liquid nitrous oxide (N₂O) as oxidizer and paraffin wax as fuel. The tool supports both steady-state and transient (unsteady) simulations, enabling parametric design studies, flight trajectory prediction, and validation against experimental hot-fire test data.
 
 ## 🚀 Quick Start Guide
 
-Follow these steps to get the code running on your machine.
+Follow these steps to get the code running on your own computer.
 
 ### 1. Prerequisites
 
