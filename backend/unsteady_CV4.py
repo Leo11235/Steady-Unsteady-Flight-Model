@@ -1,1 +1,0 @@
-# body (entire rocket) control volume: computes [z_R, v_R, a_R] for each timestep
