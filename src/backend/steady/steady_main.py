@@ -14,8 +14,13 @@ import json
 
 def steady_main(input_file_path):
     # create dictionaries of rocket inputs, simulation settings
-    rocket_inputs = read_input_file(input_file_path)
-        
+    rocket_inputs = get_rocket_inputs(input_file_path)
+    run_with_inputs(rocket_inputs)
+
+def get_rocket_inputs(input_file_path):
+    return read_input_file(input_file_path)
+
+def run_with_inputs(rocket_inputs):
     # determine simulation type and run the appropriate one 
     # hotfire test
     if simulation_settings_dict["simulation type"].lower() == "hotfire": # calculates internal rocket dynamics without calculating rocket flight
