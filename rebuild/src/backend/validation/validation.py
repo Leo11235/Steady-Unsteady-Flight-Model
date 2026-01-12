@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ..steady.steady_main import steady_main
 
-arr = ["2.2", "2.3", "2.4", "2.6", "2.7", "3.1", "3.4", "3.5", "4.1"]
+registered_hotfires = ["2.2", "2.3", "2.4", "2.6", "2.7", "3.1", "3.4", "3.5", "4.1"]
 
 def dic_of (path):
     with open (path) as f:
@@ -20,7 +20,7 @@ def getFirstLocAtVal (list, value):
             return i
     raise Exception("no value >= " + value)
 
-def graph_all (path):
+def graph_hotfire_data (path):
     dic = dic_of(path)
     sec = dic['seconds']
     offset = sec[0]
@@ -30,7 +30,7 @@ def graph_all (path):
     for k in dic.keys():
         if (k == "seconds"): continue
         if (len(sec) != len (dic[k])):
-            print(f"{path} + key {k} has length {len(dic[k])}")
+            print(f"----{path} + key {k} has length {len(dic[k])}")
             continue
         i = i + 1
         plt.figure(i - 1)
@@ -52,7 +52,8 @@ def graph_all (path):
 
         total_impulse = 0
         for i in range(len(dic[k]) - 1): total_impulse += dic[k][i] * (sec[i + 1] - sec[i])
-        print(f"{path}: total impulse {total_impulse}")
+        hotfire_name = path.split("/")[-1]
+        print(f"----{hotfire_name}: total impulse {total_impulse}")
 
         plt.title(path + ' graph ' + k)
         diff = (max(dic[k])-min(dic[k]))
@@ -67,7 +68,7 @@ def graph_steady (steady_dic, start_time):
     plt.plot([start_time - margin, start_time, start_time + burntime, start_time + burntime+margin], [0, thrust, thrust, 0])
 
     total_impulse = steady_dic[1]['total impulse']
-    print(f"steady_sim total_impulse = {total_impulse}")
+    print(f"----steady_sim total_impulse = {total_impulse}")
 
 
 # if __name__ == "__main__":
