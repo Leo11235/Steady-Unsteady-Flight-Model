@@ -55,7 +55,7 @@ def graph_hotfire_data (path):
         hotfire_name = path.split("/")[-1]
         print(f"----{hotfire_name}: total impulse {total_impulse}")
 
-        plt.title(path + ' graph ' + k)
+        plt.title(hotfire_name + ' graph ' + k)
         diff = (max(dic[k])-min(dic[k]))
         if (diff == 0): diff = 0.1
         plt.yticks(np.arange(min(dic[k]), max(dic[k]), diff/10)) 
