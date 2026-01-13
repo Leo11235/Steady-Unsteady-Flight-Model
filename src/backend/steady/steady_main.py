@@ -20,11 +20,11 @@ def steady_main(input_file_path):
 def get_rocket_inputs(input_file_path):
     return read_input_file(input_file_path)
 
-def run_with_inputs(rocket_inputs):
+def run_with_inputs(rocket_inputs, silent=False):
     # determine simulation type and run the appropriate one 
     # hotfire test
     if simulation_settings_dict["simulation type"].lower() == "hotfire": # calculates internal rocket dynamics without calculating rocket flight
-        print('Running hotfire test')
+        if (not silent): print('Running hotfire test')
         if not "initial internal fuel radius" in rocket_inputs or not rocket_inputs["initial internal fuel radius"]: # requires 'initial internal fuel radius' to be in rocket_inputs
             print("ERROR: Must enter a valid initial internal fuel radius!")
             exit()

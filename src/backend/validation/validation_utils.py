@@ -4,9 +4,9 @@ import numpy as np
 from ..steady.steady_main import steady_main
 
 registered_hotfires = ["2.2", "2.3", "2.4", "2.6", "2.7", "3.1", "3.4", "3.5", "4.1"]
-valid_hotfires = list(["3.1", "3.2", "3.4", "3.5", "4.1"])
+valid_hotfires = list(["3.1", "3.4", "3.5", "4.1"])
 start_arr =    [0, 0, 0, 0, 0, 22.75, 9, 5.63, 5]
-burntime_arr = [0, 0, 0, 0, 0, 19, 0, 0, 20]
+burntime_arr = [0, 0, 0, 0, 0, 10.5, 7.2, 8, 10]
 
 def dic_of (path):
     with open (path) as f:
@@ -36,18 +36,16 @@ def graph_all (path, J):
         if (len(sec) != len(dic_data[k])):
             print(f"{path} + key {k} has length {len(dic_data[k])}")
             continue
-        print(k)
         if (k == "thrust"): graph_thrust(path, sec, dic_data[k], dic, J)
         elif (k == "cc_pressure"): graph_pressure(path, sec, dic_data[k], dic, J)
     return dic
 
 def graph_pressure (path, sec, pressure, dic, J):
-    print("graph_pressure")
     # plt.figure('cc_pressure')
     # plt.xlabel('seconds')
     # plt.ylabel('cc_pressure')
     # plt.plot(sec, pressure) #adjusted thrust so it starts and ends ~0N
-    # plt.title(path + ' cc_pressure graph')
+    # plt.title(path.split("/")[-1] + ' cc_pressure graph')
 
     avg_cc_pressure = 0
     for i in range(len(pressure) - 1): 
@@ -60,10 +58,13 @@ def graph_pressure (path, sec, pressure, dic, J):
 
 
 def graph_thrust (path, sec, dict_k, dic, J):
+    burntime = burntime_arr[J]
+    starttime = start_arr[J]
+
     plt.figure('thrust')
     plt.xlabel('seconds')
     plt.ylabel('thrust')
-    plt.plot([sec[0], sec[-1]], [0, 0])
+    # plt.plot([sec[0], sec[-1]], [0, 0], color="black", linewidth=1) # zero axis
 
     total_impulse_uncorrected = 0
     for i in range(len(dict_k) - 1): total_impulse_uncorrected += dict_k[i] * (sec[i + 1] - sec[i])
@@ -73,9 +74,21 @@ def graph_thrust (path, sec, dict_k, dic, J):
     for i in range(len(dict_k)):
         if (i > first_index and dict_k[i] > 0.7 * last_avg): dict_k[i] -= last_avg
     
-    plt.plot(sec, dict_k) #adjusted thrust so it starts and ends ~0N
+    #plt.plot(sec, dict_k) #adjusted thrust so it starts and ends ~0N
+    #plot in three segments
+    temp_thrusts = [[], [], []]
+    temp_seconds = [[], [], []]
+    for i in range(len(sec)):
+        if (sec[i] < starttime): sel = 0
+        elif (sec[i] < starttime + burntime): sel = 1
+        else: sel = 2
+        temp_thrusts[sel].append(dict_k[i])
+        temp_seconds[sel].append(sec[i])
+    plt.plot(temp_seconds[0], temp_thrusts[0], linewidth=0.5, color="gray")
+    plt.plot(temp_seconds[2], temp_thrusts[2], linewidth=0.5, color="gray")
+    plt.plot(temp_seconds[1], temp_thrusts[1], linewidth=1.2, color="orange")
 
-    plt.title(path + ' thrust graph')
+    plt.title(path.split("/")[-1] + ' thrust graph')
     diff = (max(dict_k)-min(dict_k))
     if (diff == 0): diff = 0.1
     plt.yticks(np.arange(min(dict_k), max(dict_k), diff/10)) 
@@ -86,9 +99,7 @@ def graph_thrust (path, sec, dict_k, dic, J):
     total_impulse = 0
     for i in range(len(dict_k) - 1): total_impulse += dict_k[i] * (sec[i + 1] - sec[i])
 
-    burntime = burntime_arr[J]
-
-    dic['max_thrust'] = tmax
+    dic['peak_thrust'] = tmax
     # dic['avg_cc_pressure'] = 
     dic['burntime'] = burntime
     dic['avg_thrust'] = total_impulse / burntime
@@ -101,13 +112,16 @@ def graph_steady (steady_dic, i):
     burntime = steady_dic[1]['burntime']
     margin = 0.001
     plt.figure("thrust")
-    plt.plot([start_time - margin, start_time, start_time + burntime, start_time + burntime+margin], [0, thrust, thrust, 0])
+    pwlx = [0, start_time - margin, start_time, start_time + burntime, start_time + burntime+margin]
+    pwly = [0, 0, thrust, thrust, 0]
+    plt.plot(pwlx, pwly, color="darkgreen", linestyle="dashed", linewidth=1)
 
     total_impulse = steady_dic[1]['total impulse']
     # print(f"  steady_sim\n\ttotal_impulse = {total_impulse}\n\tthrust = {thrust}")
 
     dic = {}
     dic['avg_thrust'] = thrust
+    dic['peak_thrust'] = thrust #to simplify print code, since these are the same in steady.
     dic['burntime'] = burntime
     dic['total_impulse'] = total_impulse
     return dic
