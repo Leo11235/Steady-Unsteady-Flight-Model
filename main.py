@@ -21,7 +21,7 @@ def steady_validation():
         print(" " * int((lc + 1) / 2), s,  " " * int(lc / 2), sep = "", end="")
     print("\u001B[0m")
     print("    ", label_snippet * len(categories), "|", sep="")
-    print("-" * 4, ("|" + "-" * (len(label_snippet) - 1)) * len(categories), "|-", sep="")
+    print("-" * 4, ("|" + "-" * (len(label_snippet) - 1)) * len(categories), "|", sep="")
 
     for i in range(len(rh)):
         if (not rh[i] in cur_valid): continue
