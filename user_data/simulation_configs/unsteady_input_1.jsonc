@@ -25,7 +25,7 @@
     "fuel density": 900, // p_f [kg/m^3]
 
     // state vector init: rocket body
-  "launch site altitude": 360, // z_R [m]
+    "launch site altitude": 360, // z_R [m]
 
 
 
