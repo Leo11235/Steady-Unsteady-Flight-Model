@@ -1,0 +1,39 @@
+{
+    "simulation settings" : {
+        // must be set
+        "simulation type": "hotfire", 
+        // overrides defaults
+        "debug comments": "none", 
+        "output units": "SI", // SI, IMP, or MRT (rocket team's own mishmash of SI and IMP)
+        "show output graphs": true, // whether to show graphs once the simulation is done computing
+        "same simulation data": true // whether to save simulation data
+    },
+
+    "simulation constants": { // used to override natural and simulation constants, eg: 
+        "tolerated apogee difference": 1 // changes acceptable distance between rocket apogee and target apogee to 1 meter
+    },
+
+    "rocket attributes" : {
+        // required hotfire inputs
+        "oxidizer mass flow rate": 1.025, // kg/s
+        "chamber pressure": 1792700, // Pa
+            // fuel cell dimensions
+        "fuel external radius": 0.085725, // m
+        "initial internal fuel radius": 0.064008, // m
+        "fuel length": 0.6096, // m
+
+        // can be anything
+        "launch site altitude": 364, // m // try to approximate testsite altitude
+        "dry mass": 1, // kg // put anything here
+
+        // PROPEP stuff here
+        "liquid oxidizer type": "NITROUS OXIDE",
+        "oxidizer molecule code": 657,
+        "solid fuel type": "EICOSANE (PARAFFIN)",
+        "fuel molecule code": 1029,
+        // from literature
+        "fuel grain density": 900, // kg/m^3
+        "regression rate scaling coefficient": 0.000132, // [.]
+        "regression rate exponent": 0.555 // [.]
+        }
+    }
