@@ -15,7 +15,7 @@ import json
 def steady_main(input_file_path):
     # create dictionaries of rocket inputs, simulation settings
     rocket_inputs = get_rocket_inputs(input_file_path)
-    run_with_inputs(rocket_inputs)
+    return run_with_inputs(rocket_inputs)
 
 def get_rocket_inputs(input_file_path):
     return read_input_file(input_file_path)

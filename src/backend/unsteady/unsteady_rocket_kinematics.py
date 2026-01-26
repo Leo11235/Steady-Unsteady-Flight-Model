@@ -1,5 +1,14 @@
 from math import e
+from pathlib import Path
+import json5
 
+
+_ROOT_DIR = Path(__file__).resolve().parents[3]
+# example: to get to natural_constants.jsonc:
+# natural_constants_file_path = _ROOT_DIR / "src" / "backend" / "static_data" / "natural_constants.jsonc"
+# with open(natural_constants_file_path, "r") as f:
+#     constants_dict = json5.load(f)
+# print(constants_dict)
 
 # calculates air density for a given altitude
 def calculate_air_density(constants_dict, height):

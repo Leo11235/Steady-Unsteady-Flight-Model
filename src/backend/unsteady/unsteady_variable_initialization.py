@@ -1,6 +1,9 @@
 import json, re, numpy, math
 from .unsteady_N2O_properties import get_N2O_property
-from .unsteady_rocket_ascent import calculate_air_density
+from .unsteady_rocket_kinematics import calculate_air_density
+from pathlib import Path
+
+_ROOT_DIR = Path(__file__).resolve().parents[3]
 
 # process inputs, modifies simulation_settings_dict and constants_dict, and outputs a rocket_inputs dict
 def read_input_file(input_file):
@@ -25,8 +28,9 @@ def read_input_file(input_file):
 
 # returns a dict of natural constants used throughout the simulation. 
 def initialize_natural_constants_dict():
+    print(_ROOT_DIR)
     # find and open file
-    file = "./data/natural_constants.jsonc"
+    file = _ROOT_DIR / "src" / "backend" / "static_data" / "natural_constants.jsonc"
     with open(file, 'r') as f:
         content = f.read()
     # remove comments

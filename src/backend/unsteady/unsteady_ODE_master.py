@@ -1,6 +1,6 @@
 from .unsteady_N2O_properties import get_N2O_property
 from ..PROPEP.interpolate_PROPEP import get_chamber_properties_with_partials
-from .unsteady_rocket_ascent import calculate_ambient_pressure
+from .unsteady_rocket_kinematics import calculate_ambient_pressure
 import numpy as np
 from scipy.optimize import fsolve
 
@@ -93,7 +93,7 @@ def ODE_master(cached_data, state_vector):
     (time, n_v, n_l, T_T, r_f, m_o, m_f, p_C, z_R, v_R, a_R) = x
     
     # create a time derivative state vector, with values to be filled in during the following calculations
-    dx_dt = [time, 0,0,0,0,0,0,0,0,0,0]
+    dx_dt = [time, 0,0,0,0,0,0,0,0,0,0] # the rate of change of each item in the state vector
     
     ########################
     # ODE while loop:
@@ -124,7 +124,7 @@ def ODE_master(cached_data, state_vector):
             # oxidizer molar flow rate (for liquid blowdown only)
             n_dot = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_l))
 
-            # set up Ax=b system, where dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
+            # set up Av=b system, where dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
             A = np.array([
                 [1, 1, 0], 
                 [v_v, v_l, n_v * d_v_v_d_T_T + n_l * d_v_l_d_T_T],
@@ -133,8 +133,8 @@ def ODE_master(cached_data, state_vector):
             b = np.array([-n_dot, 0, -n_dot * h_o])
 
             # solve and assign values to the time derivative state vector
-            x = np.linalg.solve(A, b)
-            dn_v_dt, dn_l_dt, dT_T_dt = x
+            v = np.linalg.solve(A, b)
+            dn_v_dt, dn_l_dt, dT_T_dt = v
             dx_dt[1] = dn_v_dt
             dx_dt[2] = dn_l_dt
             dx_dt[3] = dT_T_dt
@@ -330,20 +330,26 @@ def ODE_master(cached_data, state_vector):
 
 
 
-        # ==================================
-        # ==== Compute new state vector ====
-        # ==================================
+        # ====================================================
+        # ==== Compute newest entries to the state vector ====
+        # ====================================================
+        
+        delta_x = [dt,0,0,0,0,0,0,0,0,0,0] # how much each quantity changes in the time dt
+        delta_x[1] = state_vector[-1] + dx_dt[1] * dt # n_v = moles of N2O vapor in the tank [mol]
 
-        x[1] = dx_dt[1] * dt
-        x[2] = dx_dt[2] * dt
-        x[3] = dx_dt[3] * dt
-        x[4] = dx_dt[4] * dt
-        x[5] = dx_dt[5] * dt
-        x[6] = dx_dt[6] * dt
-        x[7] = dx_dt[7] * dt
-        x[8] = dx_dt[8] * dt
-        x[9] = dx_dt[9] * dt
-        x[10] = dx_dt[10] * dt
+        x[1] = dx_dt[1] * dt # n_v = moles of N2O vapor in the tank [mol]
+        x[2] = dx_dt[2] * dt # n_l = moles of N2O liquid in the tank [mol]
+        x[3] = dx_dt[3] * dt # T_T = tank temperature [K]
+        x[4] = dx_dt[4] * dt # r_f = fuel cell internal radius [m]
+        x[5] = dx_dt[5] * dt # m_o = oxidizer mass in the combustion chamber [kg]
+        x[6] = dx_dt[6] * dt # m_f = fuel mass in the combustion chamber [kg]
+        x[7] = dx_dt[7] * dt # p_C = combustion chamber pressure [Pa]
+        # not done (rocket kinematics)
+        x[8] = dx_dt[8] * dt # z_R = rocket altitude [m]
+        x[9] = dx_dt[9] * dt # v_R = rocket velocity [m/s]
+        x[10] = dx_dt[10] * dt # a_R = rocket acceleration [m/s^2]
+        
+        
         
         update_state_vector(x, state_vector)
 

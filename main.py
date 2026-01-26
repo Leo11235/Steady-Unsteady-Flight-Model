@@ -2,8 +2,11 @@ from pathlib import Path
 import pandas as pd 
 import matplotlib.pyplot as plt
 
+
 from src.backend import validation_utils
 from src.backend.steady import steady_main
+from src.backend.unsteady import unsteady_main
+
 
 _ROOT_DIR = Path(__file__).resolve().parent
 
@@ -43,7 +46,8 @@ def steady_validation():
         for i in range(len(categories)):
             hotfire_val = hotfire_results[category_keys[i]]
             steady_val = steady_results[category_keys[i]]
-            error = 100 * (steady_val / hotfire_val - 1)
+            #error = 100 * (steady_val / hotfire_val - 1)
+            error = 100 * (steady_val - hotfire_val) / hotfire_val
 
             hs = format(hotfire_val, formats[i])
             ss = format(steady_val, formats[i])
@@ -53,6 +57,25 @@ def steady_validation():
         print("|")
     print("\n")
 
+def run_simple_steady():
+    '''
+    Run the standard steady program using user_data/simulation_configs/steady_Esteban's_Ancalagon.jsonc 
+    '''
+    config_file = _ROOT_DIR / "user_data" / "simulation_configs" / "steady_Esteban's_Ancalagon.jsonc"
+    # run steady
+    sim_output = steady_main.steady_main(config_file)
+    # print output
+    steady_main.print_dict(sim_output["rocket parameters"])
+
+def run_unsteady():
+    '''
+    Run unsteady using user_data/simulation_configs/unsteady_input_1.jsonc 
+    '''
+    config_file = _ROOT_DIR / "user_data" / "simulation_configs" / "unsteady_input_1.jsonc"
+    # run steady
+    sim_output = unsteady_main.unsteady_main(config_file)
+    # print output
+    steady_main.print_dict(sim_output)
 
 if __name__ == "__main__":
-    steady_validation()
+    run_unsteady()
