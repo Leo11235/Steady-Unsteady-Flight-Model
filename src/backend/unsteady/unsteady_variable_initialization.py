@@ -90,15 +90,25 @@ def initialize_state_vector(rocket_inputs, N2O_properties_dict, constants_dict):
         'n_v': [n_v], # moles of N2O in vapor phase the tank
         'n_l': [n_l], # moles of N2O in liquid phase the tank
         'T_T': [T_T_0], # tank temperature
-        # CV2: combustion chamber
+        # CV2: combustion chamber (CC)
         'r_f': [r_f], # fuel cell internal radius
-        'm_o': [m_o], # oxidizer mass in the combustion chamber
-        'm_f': [m_f], # fuel mass in the combustion chamber
-        'p_C': [p_C], # combustion chamber pressure
+        'm_o': [m_o], # oxidizer mass in the CC
+        'm_f': [m_f], # fuel mass in the CC
+        'p_C': [p_C], # CC pressure
+        'OF': [0], # oxidizer to fuel ratio in the CC (initially there is no oxidizer)
+        'T_C': [rocket_inputs["tank initial temperature"]], # CC initial temperature aka ambient temperature, this is close enough
+        # CV3: nozzle
+        'F_x': [0], # horizontal thrust component
+        'F_y': [0], # vertical thrust component
         # CV4: entire rocket (might split into horizontal and vertical components)
-        'z_R': [z_R], # rocket altitude
-        'v_R': [v_R], # rocket total velocity
-        'a_R': [a_R], # vertical acceleration
+        'sy_R': [rocket_inputs["launch site altitude"]], # vertical position
+        'sx_R': [0], # horizontal position (launchsite = 0; gets furhter from launchsite during flight)
+        'vy_R': [0], # vertical velocity
+        'vx_R': [0], # horizontal velocity
+        'ay_R': [0], # vertical acceleration
+        'ax_R': [0], # horizontal acceleration
+        'D_x': [0], # horizontal drag force
+        'D_y': [0], # vertical drag force
     }
 
 # uses tank ullage factor to initialize the state vector, returns state vector at t=0

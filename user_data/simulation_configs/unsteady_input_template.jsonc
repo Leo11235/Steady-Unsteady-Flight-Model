@@ -1,105 +1,49 @@
 {
   "rocket attributes": {
     "rocket name": "",
-    "target apogee": "",
+
+    // rocket body
+    "rocket dry mass": "",
+    "rocket drag coefficient": "",
+    "rocket frontal area": "",
+    "rocket launch angle": "",
     "launch site altitude": "",
-    "dry mass": "",
-    "rocket external diameter": "",
-    "drag coefficient": "",
-    "launch angle degrees": "",
-
-    // state vector init
-    "oxidizer total mass in propulsion system": "", // m_o_tot
-    "oxidizer molar weight": "", // W_o
-    "dip tube external diameter": "", // D_dt
-    "dip tube internal diameter": "", // d_dt
-    "dip tube length": "", // L_dt
-    "tank internal diameter": "", // d_T
-    "tank initial temperature": "", // T_T_0
-    // ONE of the following:
-    "tank ullage factor": "", // U 
-    "tank internal length": "", // L_T
-
-    // CV1
-    "oxidizer liquid volume": "", // V_l
-    "oxidizer vapor volume": "", // V_V
-
-    "tank oxidizer liquid moles": "", // n_l
-    "tank oxidizer vapor moles": "", // n_v
-    "moles of N2O in vapor phase the tank": "", // v_v
-    "moles of N2O in liquid phase the tank": "", // v_l
-
+    // parachutes
+    "drogue parachute drag coefficient": "",
+    "drogue parachute frontal area": "",
+    "main parachute deployment altitude": "",
+    "main parachute drag coefficient": "",
+    "main parachute frontal area": "",
+    // oxidizer tank
+    "tank oxidizer mass": "",
+    "tank temperature": "",
+    "tank pressure": "",
+    "tank internal diameter": "",
+    "tank internal shell length": "",
+    "tank internal volume": "",
+      // need ullage factor OR internal length
+    "tank ullage factor": "",
+    "tank internal length": "",
+    // dip tube
+    "dip tube external diameter": "",
+    "dip tube internal diameter": "",
+    "dip tube length": "",
+    // injector and feed
     "injector discharge coefficient": "", // C_i
     "injector number of holes": "", // N_i
     "injector hole area": "", // A_i (area PER hole)
-
-
-    // CV2
-    "regression rate scaling coefficient": "", // a
-    "regression rate exponent": "" // n
-    
-    
-    
-  },
-
-
-
-
-
-
-  "propulsion_system": {
-    "oxidizer": {
-      "type": "",
-      "molecule_code": "",
-      "initial_mass": "",
-      "initial_tank_temperature": "",
-      "ullage_factor": ""
-    },
-    "fuel_grain": {
-      "type": "",
-      "molecule_code": "",
-      "density": "",
-      "external_radius": "",
-      "initial_internal_radius": "",
-      "length": "",
-      "total_mass": "",
-      "regression_rate_constant_a": "",
-      "regression_rate_exponent_n": ""
-    },
-    "combustion_chamber": {
-      "pre_chamber_volume": "",
-      "post_chamber_volume": "",
-      "target_chamber_pressure": "",
-      "target_mass_flow_rate": ""
-    },
-    "tank_and_feed_system": {
-      "tank_internal_diameter": "",
-      "tank_internal_length": "",
-      "dip_tube_external_diameter": "",
-      "dip_tube_internal_diameter": "",
-      "injector_discharge_coefficient": "",
-      "number_of_injector_holes": "",
-      "injector_hole_diameter": "",
-      "feed_system_pressure_loss": ""
-    },
-    "nozzle": {
-      "throat_diameter": "",
-      "exit_diameter": "",
-      "throat_area": "",
-      "exit_area": "",
-      "divergence_half_angle_degrees": ""
-    }
-  },
-
-  "recovery_system": {
-    "drogue_parachute": {
-      "drag_coefficient": "",
-      "surface_area": ""
-    },
-    "main_parachute": {
-      "drag_coefficient": "",
-      "surface_area": "",
-      "deployment_altitude": ""
-    }
+    "feed pressure loss": "",
+    // combustion chamber
+    "chamber fuel mass": "",
+    "chamber fuel length": "",
+    "chamber fuel density": "",
+    "chamber fuel external radius": "",
+    "chamber regression rate scaling constant": "",
+    "chamber regression rate exponent": "",
+    "pre-chamber volume": "",
+    "post-chamber volume": "",
+    // nozzle
+    "nozzle throat radius": "",
+    "nozzle exit radius": ""
   }
 }
