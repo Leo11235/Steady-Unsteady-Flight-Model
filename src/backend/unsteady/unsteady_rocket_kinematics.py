@@ -30,3 +30,54 @@ def calculate_air_density(constants_dict, height):
 # returns ambient pressure at rocket_height
 def calculate_ambient_pressure(constants_dict, rocket_height):
     return
+
+# calculates post-burn trajectory of the rocket
+def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict):
+    dt = rocket_inputs["timestep length"]
+    sy_R = state_vector["sy_R"][-1]
+    sx_R = state_vector["sx_R"][-1]
+    vy_R = state_vector["vy_R"][-1]
+    vx_R = state_vector["vx_R"][-1]
+    ay_R = state_vector["ay_R"][-1]
+    ax_R = state_vector["ax_R"][-1]
+
+    C_d_drogue = rocket_inputs["drogue parachute drag coefficient"]
+    A_drogue = rocket_inputs["drogue parachute frontal area"]
+    H_deployment = rocket_inputs["main parachute deployment altitude"]
+    C_d_main = rocket_inputs["main parachute drag coefficient"]
+    A_main = rocket_inputs["main parachute frontal area"]
+
+    (F_y, F_x) = 0
+    m_R = 0
+
+    # ascent
+    while(vy_R >= 0):
+        #new_ay_R = F_Y
+
+        state_vector["sy_R"].append()
+        state_vector["sx_R"].append()
+        state_vector["vy_R"].append()
+        state_vector["vx_R"].append()
+        state_vector["ay_R"].append()
+        state_vector["ax_R"].append()
+
+    # drogue chute descent
+    while(vy_R >= H_deployment):
+
+        state_vector["sy_R"].append()
+        state_vector["sx_R"].append()
+        state_vector["vy_R"].append()
+        state_vector["vx_R"].append()
+        state_vector["ay_R"].append()
+        state_vector["ax_R"].append()
+
+    # main chute descent
+    while(sy_R <= rocket_inputs["launch site altitude"]):
+
+        state_vector["sy_R"].append()
+        state_vector["sx_R"].append()
+        state_vector["vy_R"].append()
+        state_vector["vx_R"].append()
+        state_vector["ay_R"].append()
+        state_vector["ax_R"].append()
+    return
