@@ -45,44 +45,39 @@ def initialize_natural_constants_dict():
 def initialize_state_vector(rocket_inputs, N2O_properties_dict, constants_dict):
     # INITIALIZE CV1: tank state variables [n_v, n_l, T_T]
     # initialize saturated N2O properties
-    T_T_0 = rocket_inputs['tank initial temperature']
+    T_T_0 = rocket_inputs['tank temperature']
     v_l = get_N2O_property('v_l', T_T_0, N2O_properties_dict) # v_l = liquid molar volume at T_T_0
     v_v = get_N2O_property('v_v', T_T_0, N2O_properties_dict) # v_v = vapor molar volume at T_T_0
     p_0 = get_N2O_property('p', T_T_0, N2O_properties_dict) # pressure?
     # unpack some rocket parameters
-    m_o_tot_0 = rocket_inputs["oxidizer total initial mass"]
-    W_o = rocket_inputs["oxidizer molar mass"]
+    m_o_tot_0 = rocket_inputs["tank oxidizer mass"]
+    W_o = rocket_inputs["tank oxidizer molar mass"]
     d_T = rocket_inputs["tank internal diameter"]
     D_dt = rocket_inputs["dip tube external diameter"]
     d_dt = rocket_inputs["dip tube internal diameter"]
     
     # decide whether to initialize tank variables using ullage or tank length
-    if rocket_inputs.get("tank internal length", "") != "":
-        print("Initializing state vector using tank internal length")
+    if rocket_inputs.get("tank internal length", ""): # value is not "" and not None
+        #print("Initializing state vector using tank internal length")
         return initialize_state_vector_using_tank_length(rocket_inputs, v_l, v_v, m_o_tot_0, W_o, d_T, D_dt, d_dt)
-    elif rocket_inputs.get("tank ullage factor", "") != "":
-        # print("Initializing state vector using tank ullage")
+    elif rocket_inputs.get("tank ullage factor", ""):
+        #print("Initializing state vector using tank ullage")
         V_l, n_l, n_v, L_T, L_dt = initialize_state_vector_using_ullage(rocket_inputs, v_l, v_v, m_o_tot_0, W_o, d_T, D_dt, d_dt)
     else:
         raise ImportError("Tank length and ullage not found")
     
     # INITIALIZE CV2: combustion chamber variables [r_f, m_o, m_f, p_C]
     # unpack more variables
-    R_f = rocket_inputs["fuel external radius"]
-    m_f_tot = rocket_inputs["total initial fuel mass"]
-    p_f = rocket_inputs["fuel density"]
-    L_f = rocket_inputs["fuel length"]
+    R_f = rocket_inputs["chamber fuel external radius"]
+    m_f_tot = rocket_inputs["chamber fuel mass"]
+    p_f = rocket_inputs["chamber fuel density"]
+    L_f = rocket_inputs["chamber fuel length"]
     
     # calculate unknown variables
     r_f = math.sqrt(R_f**2 - m_f_tot/(math.pi*p_f*L_f)) # initial fuel port internal radius
     m_f = 0 # initial fuel in the chamber
     m_o = 0 # initial oxidizer in the chamber
-    p_C = calculate_air_density(constants_dict, rocket_inputs["launch site altitude"]) # initial chamber pressure; initially the same as ambient pressure
-    
-    # INITIALIZE CV4: rocket (body) variables [z_R, v_R, a_R]
-    z_R = rocket_inputs["launch site altitude"] # height
-    v_R = 0 # velocity
-    a_R = 0 # acceleration
+    p_C = 101325 # [Pa] initial chamber pressure; initially the same as ambient pressure
     
     return {
         'time': [0],
@@ -96,11 +91,11 @@ def initialize_state_vector(rocket_inputs, N2O_properties_dict, constants_dict):
         'm_f': [m_f], # fuel mass in the CC
         'p_C': [p_C], # CC pressure
         'OF': [0], # oxidizer to fuel ratio in the CC (initially there is no oxidizer)
-        'T_C': [rocket_inputs["tank initial temperature"]], # CC initial temperature aka ambient temperature, this is close enough
+        'T_C': [rocket_inputs["tank temperature"]], # CC initial temperature aka ambient temperature, this is close enough
         # CV3: nozzle
         'F_x': [0], # horizontal thrust component
         'F_y': [0], # vertical thrust component
-        # CV4: entire rocket (might split into horizontal and vertical components)
+        # CV4: entire rocket
         'sy_R': [rocket_inputs["launch site altitude"]], # vertical position
         'sx_R': [0], # horizontal position (launchsite = 0; gets furhter from launchsite during flight)
         'vy_R': [0], # vertical velocity

@@ -1,0 +1,66 @@
+{
+  "rocket attributes": {
+    "rocket name": "Please please pleeeeease work",
+    "timestep length": 0.01, // [s]
+
+    // rocket body
+    "rocket dry mass": 90, // [kg]
+    "rocket drag coefficient": 0.64, // [.]
+    "rocket frontal area": 0.1257, // [m^2]
+    "rocket launch angle": 6, // [°]
+    "launch site altitude": 360, // z_R [m]
+    // parachutes
+    "drogue parachute drag coefficient": 1.2, // [.]
+    "drogue parachute frontal area": 0.28, // [m^2]
+    "main parachute deployment altitude": 600, // [m]
+    "main parachute drag coefficient": 1.5, // [.]
+    "main parachute frontal area": 9.62, // m^2
+    // oxidizer tank
+    "tank oxidizer mass": 4, // m_o_tot [kg]
+    "tank temperature": 300, // T_T, [K]
+    "tank pressure": 5000000, // [Pa]
+    "tank internal diameter": 0.2, // d_T [m]
+    "tank internal shell length": 0.5, // [m]
+    "tank internal volume": 0.0157, // [m^3]
+    "tank oxidizer molar mass": 0.044013, // W_o [kg/mol]
+      // ONE of the following:
+    "tank ullage factor": 0.5, // U [.]
+    "tank internal length": "", // L_T [m]
+    // dip tube
+    "dip tube external diameter": 0.012, // D_dt [m]
+    "dip tube internal diameter": 0.008, // d_dt [m]
+    "dip tube length": 0.45, // [m]
+    // injector and feed
+    "injector discharge coefficient": 0.8, // C_i
+    "injector number of holes": 36, // N_i
+    "injector hole area": 1.8e-6, // A_i (area PER hole)
+    "feed pressure loss": 300000, // Pa
+    // combustion chamber
+    "chamber fuel mass": 2, // m_f_tot [kg]
+    "chamber fuel length": 0.2, // L_f [m]
+    "chamber fuel density": 900, // p_f [kg/m^3]
+    "chamber fuel external radius": 0.1, // R_f [m]
+    "chamber regression rate scaling constant": 0.000132, // [.]
+    "chamber regression rate exponent": 0.555, // [.]
+    "pre-chamber volume": 0.001,
+    "post-chamber volume": 0.0015,
+    // nozzle
+    "nozzle throat radius": 0.023, // [m], 
+    "nozzle exit radius": 0.05 // [m]
+
+
+    // //"target apogee": 15000, // [m]
+    // //"rocket external diameter": 0.2, // [m]
+    // // state vector init: combustion chamber
+    // // not sure if needed
+    // "oxidizer liquid volume": "", // V_l
+    // "oxidizer vapor volume": "", // V_V
+    // "tank oxidizer liquid moles": "", // n_l
+    // "tank oxidizer vapor moles": "", // n_v
+    // "moles of N2O in vapor phase the tank": "", // v_v
+    // "moles of N2O in liquid phase the tank": "" // v_l
+    
+    
+    
+  }
+}

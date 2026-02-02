@@ -40,7 +40,7 @@ def steady_validation():
 
         # print(f"HOTFIRE:\n\tavg_cc_pressure = {hotfire_results['avg_cc_pressure']}\n\tburntime: {hotfire_results['burntime']} (HARDCODED)\n\tpeak_thrust = {hotfire_results['max_thrust']}\n\tavg_thrust = {hotfire_results['avg_thrust']}\n\ttotal_impulse = {hotfire_results['total_impulse']}")
         # print(f"Steady Simulation:\n\tburntime: {steady_results['burntime']}\n\tavg_thrust = {steady_results['avg_thrust']}\n\ttotal_impulse = {steady_results['total_impulse']}")
-        # plt.show()
+        plt.show()
 
         print(f"{rh[i]} ", sep="", end="")
         for i in range(len(categories)):
@@ -67,11 +67,11 @@ def run_simple_steady():
     # print output
     steady_main.print_dict(sim_output["rocket parameters"])
 
-def run_unsteady():
+def run_unsteady(): # TEST
     '''
     Run unsteady using user_data/simulation_configs/unsteady_input_1.jsonc 
     '''
-    config_file = _ROOT_DIR / "user_data" / "simulation_configs" / "unsteady_input_1.jsonc"
+    config_file = _ROOT_DIR / "user_data" / "simulation_configs" / "unsteady_input_test_1.jsonc"
     # run steady
     sim_output = unsteady_main.unsteady_main(config_file)
     # print output

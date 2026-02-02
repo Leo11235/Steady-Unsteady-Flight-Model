@@ -13,10 +13,10 @@ def unsteady_main(input_json):
     state_vector = unsteady_variable_initialization.initialize_state_vector(rocket_inputs, N2O_properties_dict, constants_dict)
 
     print(f"initial state vector: {state_vector}")
-        
+    
     # run ODE master
     cached_data = unsteady_ODE_master.setup_ODE_master(rocket_inputs, constants_dict, state_vector)
-    state_vector = unsteady_ODE_master.ODE_master(cached_data)
+    state_vector = unsteady_ODE_master.ODE_master(cached_data, state_vector)
     
     return state_vector
 

@@ -79,6 +79,7 @@ def ODE_master(cached_data, state_vector):
     # ========================================
     # ========== Unpack cached data ==========
     # ========================================
+    print(1)
     
     (state_vector, dt, m_dry, C_d, A_R, theta, C_d_drogue, A_drogue, H_deployment, C_d_main, A_main, m_o_tot, T_T_0, p_T, d_T, L_T, V_T, U, D_dt, d_dt, L_dt, C_i, N_i, A_i, p_loss, m_f_tot, L_f, p_f, R_f, a, n, V_pre, V_post, r_t, r_e, g, R_u, W_o) = cached_data
     
@@ -105,14 +106,19 @@ def ODE_master(cached_data, state_vector):
         # D_x = horizontal drag force
         # D_y = vertical drag force
 
-    (time, n_v, n_l, T_T, r_f, m_o, m_f, p_C, z_R, v_R, a_R) = state_vector
+    (time, n_v, n_l, T_T, r_f, m_o, m_f, p_C, OF, T_C, F_x, F_y, sy_R, sx_R, vy_R, vx_R, ay_R, ax_R, D_x, D_y) = state_vector
     
     # create a time derivative state vector, with values to be filled in during the following calculations
     dx_dt = [time, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] # the rate of change of each item in the state vector
     
+    # set some initial values
+    dm_n_dt = 0 # Nozzle total propellant mass flow rate
+    
     ########################
     # ODE while loop:
-    while state_vector["vy_R"][-1]>0 and state_vector["time"][-1] > 1: # ends when velocity is 0 AND more than 1 second has elapsed
+    #while state_vector["vy_R"][-1]>=0 and state_vector["time"][-1] < 1: # ends when velocity is 0 AND more than 1 second has elapsed
+    while state_vector["vy_R"][-1]>=0: # ends when velocity is less than 0
+        print(2)
         
         # First: get latest state vector values (only for the necessary items)
         n_v = state_vector["n_v"][-1]
@@ -155,7 +161,7 @@ def ODE_master(cached_data, state_vector):
             h_o = get_N2O_property("h_l", T_T) # Oxidizer molar enthalpy (for liquid oxidizer)
 
             # oxidizer molar flow rate (for liquid blowdown only)
-            n_dot = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_l))
+            n_dot = C_i * N_i * A_i * np.sqrt(2*(p_T - p_loss - p_C) / (W_o * v_l))
 
             # set up Av=b system, where dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
             A = np.array([
@@ -177,7 +183,7 @@ def ODE_master(cached_data, state_vector):
             m = get_N2O_property("c_p_v", T_T) / get_N2O_property("c_v_v", T_T)
 
             # solve for the quantities dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
-            dn_v_dt = C_i * N_i * A_i * np.sqrt(2(p_T - p_loss - p_C) / (W_o * v_v))
+            dn_v_dt = C_i * N_i * A_i * np.sqrt(2*(p_T - p_loss - p_C) / (W_o * v_v))
             dn_l_dt = 0
             dT_T_dt = T_T * (m-1) * dn_v_dt / n_v
 
@@ -201,11 +207,11 @@ def ODE_master(cached_data, state_vector):
             dr_f_dt = 0
 
         # m_o and m_f
-        OF = m_o / m_f # oxidizer to fuel ratio
-        dm_n_dt = dm_o_out_dt + dm_f_out_dt # Nozzle total propellant mass flow rate ########### supposed to be calculated in CV3, check if this is correct
+        OF = 0 if m_f == 0 else m_o / m_f # oxidizer to fuel ratio
+        #dm_n_dt = dm_o_out_dt + dm_f_out_dt # Nozzle total propellant mass flow rate ########### supposed to be calculated in CV3, check if this is correct
 
         dm_o_in_dt = W_o * n_dot
-        dm_o_out_dt = dm_n_dt / (1+1/OF)
+        dm_o_out_dt = 0 if dm_n_dt == 0 else dm_n_dt / (1+1/OF)
         dm_o_dt = dm_o_in_dt - dm_o_out_dt
 
         dm_f_in_dt = p_f * 2 * np.pi * r_f * L_f * dr_f_dt
@@ -224,7 +230,7 @@ def ODE_master(cached_data, state_vector):
         V_c = V_pre + V_post + np.pi * r_f**2 * L_f
         dV_c_dt = 2* np.pi * r_f * dr_f_dt * L_f
         # finally, actually calculate p_C
-        dp_C_dt = (dm_c_dt/m_c - dV_c_dt/V_c + dOF_dt(dT_dOF/T_c + dW_dOF/W_c)) / (1/p_C - dT_dp/T_c + dW_dp/W_c)
+        dp_C_dt = (dm_c_dt/m_c - dV_c_dt/V_c + dOF_dt*(dT_dOF/T_c + dW_dOF/W_c)) / (1/p_C - dT_dp/T_c + dW_dp/W_c)
 
         # assign calculated values to the time derivative state vector
         dx_dt[4] = dr_f_dt
@@ -236,7 +242,7 @@ def ODE_master(cached_data, state_vector):
         # ========== CV3: Nozzle calculations ==========
         # ==============================================
         
-        p_amb = calculate_ambient_pressure(z_R)
+        p_amb = calculate_ambient_pressure(sy_R)
         
         # define some helper functions:
         # M_1, the subsonic exit mach when the nozzle throat is choked (required to find p_1)
@@ -344,7 +350,7 @@ def ODE_master(cached_data, state_vector):
         # v_e
         v_e = M_e * np.sqrt((gamma* R_u * T_e)/W_c)
         # m_d derivative w.r.t. time
-        dm_n_dt = A_t*p_C*M_t* np.sqrt((gamma* W_c)/(R_u * T_c)) * (1+((gamma-1)/2)*(M_t)**2)**(-(gamma+1)/(2(gamma-1)))
+        dm_n_dt = A_t*p_C*M_t* np.sqrt((gamma* W_c)/(R_u * T_c)) * (1+((gamma-1)/2)*(M_t)**2)**(-(gamma+1)/(2*(gamma-1)))
         # F, thrust
         F = dm_n_dt * v_e + (p_e - p_amb)*A_e
         
@@ -367,15 +373,17 @@ def ODE_master(cached_data, state_vector):
         # ==== Compute newest entries to the state vector ====
         # ====================================================    
         
-        
+        print(3)
         update_state_vector(dt, dx_dt, state_vector)
+        print(4)
 
     return state_vector
 
 
 
 # updates the state vector by applying each field in input vector x to the correct place in the state_vector dict
-def update_state_vector(dt, dx_dt, state_vector):       
+def update_state_vector(dt, dx_dt, state_vector): 
+    print("updating")      
     # Euler timestep formula: new_x = old_x + dx_dt * dt
     state_vector["time"].append(state_vector["time"][-1] + dt) 
     state_vector["n_v"].append(state_vector["n_v"][-1] + dx_dt[1] * dt) # n_v = moles of N2O vapor in the tank [mol]
