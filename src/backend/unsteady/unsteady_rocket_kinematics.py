@@ -1,6 +1,9 @@
 from math import e
+from math import cos
+from math import sin
 from pathlib import Path
 import json5
+from unsteady_variable_initialization import initialize_natural_constants_dict
 
 
 _ROOT_DIR = Path(__file__).resolve().parents[3]
@@ -9,6 +12,8 @@ _ROOT_DIR = Path(__file__).resolve().parents[3]
 # with open(natural_constants_file_path, "r") as f:
 #     constants_dict = json5.load(f)
 # print(constants_dict)
+
+constants_dict = initialize_natural_constants_dict()
 
 # calculates air density for a given altitude
 def calculate_air_density(constants_dict, height):
@@ -41,43 +46,73 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict)
     ay_R = state_vector["ay_R"][-1]
     ax_R = state_vector["ax_R"][-1]
 
+    C_d_rocket = rocket_inputs["rocket drag coefficient"]
+    A_rocket = rocket_inputs["rocket frontal area"]
     C_d_drogue = rocket_inputs["drogue parachute drag coefficient"]
     A_drogue = rocket_inputs["drogue parachute frontal area"]
     H_deployment = rocket_inputs["main parachute deployment altitude"]
     C_d_main = rocket_inputs["main parachute drag coefficient"]
     A_main = rocket_inputs["main parachute frontal area"]
+    F_g = constants_dict["sea level gravity"]
 
-    (F_y, F_x) = 0
+    Force = 0
     m_R = 0
+    theta = 0
 
     # ascent
     while(vy_R >= 0):
-        #new_ay_R = F_Y
+        new_a_R = (1/m_R)*(Force - (1/2)*C_d_rocket*A_rocket*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2) - F_g*cos(theta))
+        new_ay_R = new_a_R * cos(theta)
+        new_ax_R = new_a_R * sin(theta)
 
-        state_vector["sy_R"].append()
-        state_vector["sx_R"].append()
-        state_vector["vy_R"].append()
-        state_vector["vx_R"].append()
-        state_vector["ay_R"].append()
-        state_vector["ax_R"].append()
+        new_vy_R = ay_R*dt
+        new_vx_R = ax_R*dt
+
+        new_sy_R = vy_R*dt
+        new_sx_R = vx_R*dt
+
+        state_vector["sy_R"].append(new_sy_R)
+        state_vector["sx_R"].append(new_sx_R)
+        state_vector["vy_R"].append(new_vy_R)
+        state_vector["vx_R"].append(new_vx_R)
+        state_vector["ay_R"].append(new_ay_R)
+        state_vector["ax_R"].append(new_ax_R)
 
     # drogue chute descent
     while(vy_R >= H_deployment):
+        new_a_R = (1/m_R)(-F_g + (1/2)*(C_d_rocket*A_rocket + C_d_drogue*A_drogue)*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2))
+        new_ay_R = new_a_R * cos(theta)
+        new_ax_R = new_a_R * sin(theta)
 
-        state_vector["sy_R"].append()
-        state_vector["sx_R"].append()
-        state_vector["vy_R"].append()
-        state_vector["vx_R"].append()
-        state_vector["ay_R"].append()
-        state_vector["ax_R"].append()
+        new_vy_R = ay_R*dt
+        new_vx_R = ax_R*dt
+
+        new_sy_R = vy_R*dt
+        new_sx_R = vx_R*dt
+
+        state_vector["sy_R"].append(new_sy_R)
+        state_vector["sx_R"].append(new_sx_R)
+        state_vector["vy_R"].append(new_vy_R)
+        state_vector["vx_R"].append(new_vx_R)
+        state_vector["ay_R"].append(new_ay_R)
+        state_vector["ax_R"].append(new_ax_R)
 
     # main chute descent
-    while(sy_R <= rocket_inputs["launch site altitude"]):
+    while(sy_R > rocket_inputs["launch site altitude"]):
+        new_a_R = (1/m_R)(-F_g + (1/2)*(C_d_rocket*A_rocket + C_d_main*A_main)*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2))
+        new_ay_R = new_a_R * cos(theta)
+        new_ax_R = new_a_R * sin(theta)
 
-        state_vector["sy_R"].append()
-        state_vector["sx_R"].append()
-        state_vector["vy_R"].append()
-        state_vector["vx_R"].append()
-        state_vector["ay_R"].append()
-        state_vector["ax_R"].append()
+        new_vy_R = ay_R*dt
+        new_vx_R = ax_R*dt
+
+        new_sy_R = vy_R*dt
+        new_sx_R = vx_R*dt
+
+        state_vector["sy_R"].append(new_sy_R)
+        state_vector["sx_R"].append(new_sx_R)
+        state_vector["vy_R"].append(new_vy_R)
+        state_vector["vx_R"].append(new_vx_R)
+        state_vector["ay_R"].append(new_ay_R)
+        state_vector["ax_R"].append(new_ax_R)
     return
