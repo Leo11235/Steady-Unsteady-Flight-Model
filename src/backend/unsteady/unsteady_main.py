@@ -16,7 +16,7 @@ def unsteady_main(input_json):
     
     # run ODE master
     cached_data = unsteady_ODE_master.setup_ODE_master(rocket_inputs, constants_dict, state_vector)
-    state_vector = unsteady_ODE_master.ODE_master(cached_data, state_vector)
+    state_vector = unsteady_ODE_master.ODE_master(cached_data, state_vector, constants_dict)
     
     return state_vector
 

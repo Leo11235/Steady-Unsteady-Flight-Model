@@ -10,51 +10,71 @@ def load_lookup_table():
 ppp_df_loaded = load_lookup_table()
 
 def pyPROPEP_interpolation_lookup(OF, CP, lookup_table=ppp_df_loaded):
-
-    OF_str = f"{OF:.1f}"
-
-    try:
-        row = lookup_table.loc[(OF_str, CP)]
+    '''
+    Uses bilinear interpolation to return PROPEP values
+    '''
+    # standardize input types
+    OF = float(OF)
+    CP = float(CP)
+    
+    try: # check if input OF and CP are exact matches
+        row = lookup_table.loc[(OF, CP)]
         #chamber_temp, molar_weight, heat_ratio
         return (row["chamber_temp"], row["molar_weight"], row["heat_ratio"])
     except KeyError:
         pass  #interpolate
-
-    unique_OF = np.array(sorted({float(o) for o in lookup_table.index.get_level_values("OF")}))
-    unique_CP = np.array(sorted({int(c)    for c in lookup_table.index.get_level_values("CP")}))
     
-    if OF < unique_OF.min() or OF > unique_OF.max():
+    unique_OF = np.sort(lookup_table.index.get_level_values("OF").unique().astype(float))
+    unique_CP = np.sort(lookup_table.index.get_level_values("CP").unique().astype(float))
+    
+    if OF<1: # bump OF up a tiny bit to make the simulation work
+        OF=1
+        # boundary checks
+    elif OF < unique_OF.min() or OF > unique_OF.max():            
         raise ValueError(f"OF={OF} is outside the table bounds [{unique_OF.min()}, {unique_OF.max()}]")
     if CP < unique_CP.min() or CP > unique_CP.max():
         raise ValueError(f"CP={CP} is outside the table bounds [{unique_CP.min()}, {unique_CP.max()}]")
-
+    
+    # Clamp to table bounds to prevent crashes at extreme pressures
+    # OF = np.clip(OF, unique_OF.min(), unique_OF.max())
+    # CP = np.clip(CP, unique_CP.min(), unique_CP.max())
+    
+    # find bounds
     OF_low  = unique_OF[unique_OF <= OF].max()
     OF_high = unique_OF[unique_OF >= OF].min()
     CP_low  = unique_CP[unique_CP <= CP].max()
     CP_high = unique_CP[unique_CP >= CP].min()
+    
+    # helper to fetch data
+    def get_corner(o, p):
+        row = lookup_table.loc[(o, p)]
+        return np.array([row["chamber_temp"], row["molar_weight"], row["heat_ratio"]])
+    
+    # bilinear interpolation calculation
+    Q11 = get_corner(OF_low, CP_low)   # bottom left
+    Q12 = get_corner(OF_low, CP_high)  # top left
+    Q21 = get_corner(OF_high, CP_low)  # bottom right
+    Q22 = get_corner(OF_high, CP_high) # top right
+    
+    # check for exact matches or gridline matches to avoid division by zero
+    if OF_low == OF_high and CP_low == CP_high:
+        result = Q11
+    elif OF_low == OF_high: # vertical linear interpolation
+        result = Q11 + (Q12 - Q11) * (CP - CP_low) / (CP_high - CP_low)
+    elif CP_low == CP_high: # horizontal linear interpolation
+        result = Q11 + (Q21 - Q11) * (OF - OF_low) / (OF_high - OF_low)
+    else:
+        # standard Bilinear Formula
+        # f(x,y) ≈ [f(x1,y1)(x2-x)(y2-y) + f(x2,y1)(x-x1)(y2-y) + f(x1,y2)(x2-x)(y-y1) + f(x2,y2)(x-x1)(y-y1)] / [(x2-x1)(y2-y1)]
+        denom = (OF_high - OF_low) * (CP_high - CP_low)
+        
+        term1 = Q11 * (OF_high - OF) * (CP_high - CP)
+        term2 = Q21 * (OF - OF_low) * (CP_high - CP)
+        term3 = Q12 * (OF_high - OF) * (CP - CP_low)
+        term4 = Q22 * (OF - OF_low) * (CP - CP_low)
+        
+        result = (term1 + term2 + term3 + term4) / denom
 
-    OF_low_str  = f"{OF_low:.1f}"
-    OF_high_str = f"{OF_high:.1f}"
-
-    def get_values(OFs, CPs):
-        row = lookup_table.loc[(OFs, CPs)]
-        return np.array([
-            row["chamber_temp"],
-            row["molar_weight"],
-            row["heat_ratio"]
-        ], dtype=float)
-
-    Q11 = get_values(OF_low_str,  CP_low)
-    Q12 = get_values(OF_low_str,  CP_high)
-    Q21 = get_values(OF_high_str, CP_low)
-    Q22 = get_values(OF_high_str, CP_high)
-
-    def bilinear_interp(x, y, x1, x2, y1, y2, Q11, Q12, Q21, Q22):
-        return (Q11 * (x2 - x) * (y2 - y) + Q21 * (x - x1) * (y2 - y) + Q12 * (x2 - x) * (y - y1) + Q22 * (x - x1) * (y - y1)) / ((x2 - x1) * (y2 - y1))
-
-    result = bilinear_interp(OF, CP, OF_low, OF_high, CP_low, CP_high, Q11, Q12, Q21, Q22)
-
-    #chamber temp, molar weight, heat ratio
     return (float(result[0]), float(result[1]), float(result[2]))
 
 def get_chamber_properties_with_partials(OF, p_C, delta_OF=0.01, delta_p=1):

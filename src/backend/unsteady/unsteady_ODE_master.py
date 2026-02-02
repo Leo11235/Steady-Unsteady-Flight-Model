@@ -70,7 +70,7 @@ def setup_ODE_master(rocket_inputs, constants_dict, state_vector):
     return cached_data
 
 # runs all the ODEs in unsteady-state as optimizedly as possible
-def ODE_master(cached_data, state_vector): 
+def ODE_master(cached_data, state_vector, constants_dict): 
     # short explanation of some otherwise confusing variables: 
         # state_vector: a dict of lists containing the various quantities tracked by the program, this is the same state vector as everywhere else in the program
         # dx_dt[i]: a list tracking the rate of change of i, where the i'th element is the same as the i'th element in state_vector.
@@ -224,8 +224,13 @@ def ODE_master(cached_data, state_vector):
         # chamber gaseous mass storage & its derivative w.r.t. time
         m_c = m_o + m_f
         dm_c_dt = dm_o_in_dt + dm_f_in_dt - dm_n_dt
+        
         # OF ratio derivative w.r.t. time
-        dOF_dt = (1/m_f)*(dm_o_dt - OF*dm_f_dt)
+        if m_f > 1e-8: # use a small threshold
+            dOF_dt = (1/m_f) * (dm_o_dt - OF * dm_f_dt)
+        else:
+            dOF_dt = 0  # assume OF is constant (or forced to 1.0) while chamber is empty
+
         # chamber volume & its derivative w.r.t. time
         V_c = V_pre + V_post + np.pi * r_f**2 * L_f
         dV_c_dt = 2* np.pi * r_f * dr_f_dt * L_f
@@ -242,7 +247,7 @@ def ODE_master(cached_data, state_vector):
         # ========== CV3: Nozzle calculations ==========
         # ==============================================
         
-        p_amb = calculate_ambient_pressure(sy_R)
+        p_amb = calculate_ambient_pressure(constants_dict, sy_R)
         
         # define some helper functions:
         # M_1, the subsonic exit mach when the nozzle throat is choked (required to find p_1)
