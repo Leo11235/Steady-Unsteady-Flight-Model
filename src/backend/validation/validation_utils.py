@@ -126,6 +126,28 @@ def graph_steady (steady_dic, i):
     dic['total_impulse'] = total_impulse
     return dic
 
+#not tested yet, hopefully it works
+def graph_unsteady(unsteady_dic):
+    time = unsteady_dic["time"]
+    F_x = unsteady_dic["F_x"]
+    F_y = unsteady_dic["F_y"]
+    total_thrust = np.sqrt(F_x**2 + F_y**2)
+
+    threshold = 0.01 * np.max(total_thrust) #thrust cutoff threshold
+    burn_idx = np.where(total_thrust >= threshold)[0]
+
+    burntime_start = time[burn_idx[0]]
+    burntime_end = time[burn_idx[-1]]
+    burntime = burntime_end - burntime_start
+
+    total_impulse = np.trapz(total_thrust[burn_idx], time[burn_idx])
+
+    plt.figure("thrust")
+    plt.plot(time, total_thrust, color="darkgreen", linestyle="dashed", linewidth=1)
+
+    result_dic = {'avg_thrust': np.mean(total_thrust[burn_idx]),'peak_thrust': np.max(total_thrust),'burntime': burntime,'total_impulse': total_impulse}
+    return result_dic
+
 
 # if __name__ == "__main__":
 #     cur_valid = list(["3.1", "3.2", "3.4", "3.5", "4.1"]);
