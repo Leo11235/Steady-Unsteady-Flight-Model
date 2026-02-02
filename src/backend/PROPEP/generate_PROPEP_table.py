@@ -21,14 +21,14 @@ def load_lookup_table():
 ppp_df_loaded = load_lookup_table()
 
 # calls PROPEP for a single (OF, CP) combination (CP = chamber pressure)
-def call_PROPEP(OF, CP, CP_units = "atm", fuel_type = "EICOSANE (PARAFFIN)", oxidizer_type = "NITROUS OXIDE"): 
+def call_PROPEP(OF, CP, CP_units = "psi", fuel_type = "EICOSANE (PARAFFIN)", oxidizer_type = "NITROUS OXIDE"): 
     # oxidizer to fuel ratio and chamber pressure; units can also be Pa, psi, or atm and the conversion will be handled automatically
     
     # convert CP unit to atm if needed
     if CP_units.lower() == "psi":
         CP = CP/14.696 # convert from psi to atm
-    elif CP_units.lower() == "Pa":
-        CP = CP*101325 # convert from Pa to atm
+    elif CP_units.lower() == "pa":
+        CP = CP/101325 # convert from Pa to atm
     elif CP_units.lower() == "atm":
         None
     else:
@@ -67,16 +67,18 @@ def call_PROPEP(OF, CP, CP_units = "atm", fuel_type = "EICOSANE (PARAFFIN)", oxi
         return {"error": f"pyPROPEP - Error extracting properties: {e}"}
 
 def generate_pyPROPEP_lookup_table(OF_low_end, OF_high_end, OF_step_size, 
-                                   CP_low_end, CP_high_end, CP_step_size, 
+                                   CP_low_end, CP_high_end, CP_step_size, CP_unit,
                                    where_to_save = _ROOT_DIR / "Backend" / "Static_data" / "pypropep_lookup_table.json"):
     pypropep_data = []
     
     # compute the table
+    print("OF: ")
     for OF in np.arange(OF_low_end, OF_high_end+OF_step_size, OF_step_size):
+        print(OF)
         for CP in np.arange(CP_low_end, CP_high_end+CP_step_size, CP_step_size):
-            chamber_temp, molar_weight, heat_ratio = call_PROPEP(OF, CP)
+            chamber_temp, molar_weight, heat_ratio = call_PROPEP(OF, CP, CP_units=CP_unit)
             pypropep_data.append({
-                'OF': f"{OF:.1f}", #just to make the indexing ok
+                'OF': OF, #just to make the indexing ok
                 'CP': CP,
                 'chamber_temp': chamber_temp,
                 'molar_weight': molar_weight,
@@ -90,7 +92,12 @@ def generate_pyPROPEP_lookup_table(OF_low_end, OF_high_end, OF_step_size,
     
 # example use:
 temp_path = _ROOT_DIR / "Backend" / "PROPEP" / "temp_pypropep_lookup_file.json"
-generate_pyPROPEP_lookup_table(1, 2, 0.1, 100, 120, 10, temp_path)
+generate_pyPROPEP_lookup_table(1, 10, 0.1, 
+                               68947.6, # 10 psi lower bound
+                               6894760, # 1000 psi upper bound
+                               68947.6, # 10 psi step size
+                               "Pa", # chamber pressure unit type
+                               temp_path) # DONT do this, PROPEP becomes nonsensical with OF values below 1
 
 # plots OF vs CP vs PROPEP output
 def plot_surface_multiindex_numeric(df, z_col):
@@ -123,7 +130,10 @@ def plot_surface_multiindex_numeric(df, z_col):
 
     fig.colorbar(surf, label=z_col)
     plt.title(f"3D Surface of {z_col} vs OF & CP")
-    plt.show()
+    
 # to check if the increments are too large
-# plot_surface_multiindex_numeric(ppp_df_loaded, "chamber_temp")
+plot_surface_multiindex_numeric(ppp_df_loaded, "chamber_temp")
+plot_surface_multiindex_numeric(ppp_df_loaded, "molar_weight")
+plot_surface_multiindex_numeric(ppp_df_loaded, "heat_ratio")
 
+plt.show()
