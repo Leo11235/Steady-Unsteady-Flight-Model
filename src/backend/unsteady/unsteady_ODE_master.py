@@ -1,6 +1,6 @@
 from .unsteady_N2O_properties import get_N2O_property
 from ..PROPEP.interpolate_PROPEP import get_chamber_properties_with_partials
-from .unsteady_rocket_kinematics import calculate_ambient_pressure
+from .unsteady_rocket_kinematics import calculate_air_pressure
 import numpy as np
 from scipy.optimize import fsolve
 
@@ -79,7 +79,6 @@ def ODE_master(cached_data, state_vector, constants_dict):
     # ========================================
     # ========== Unpack cached data ==========
     # ========================================
-    print(1)
     
     (state_vector, dt, m_dry, C_d, A_R, theta, C_d_drogue, A_drogue, H_deployment, C_d_main, A_main, m_o_tot, T_T_0, p_T, d_T, L_T, V_T, U, D_dt, d_dt, L_dt, C_i, N_i, A_i, p_loss, m_f_tot, L_f, p_f, R_f, a, n, V_pre, V_post, r_t, r_e, g, R_u, W_o) = cached_data
     
@@ -118,7 +117,6 @@ def ODE_master(cached_data, state_vector, constants_dict):
     # ODE while loop:
     #while state_vector["vy_R"][-1]>=0 and state_vector["time"][-1] < 1: # ends when velocity is 0 AND more than 1 second has elapsed
     while state_vector["vy_R"][-1]>=0: # ends when velocity is less than 0
-        print(2)
         
         # First: get latest state vector values (only for the necessary items)
         n_v = state_vector["n_v"][-1]
@@ -234,8 +232,12 @@ def ODE_master(cached_data, state_vector, constants_dict):
         # chamber volume & its derivative w.r.t. time
         V_c = V_pre + V_post + np.pi * r_f**2 * L_f
         dV_c_dt = 2* np.pi * r_f * dr_f_dt * L_f
+        
         # finally, actually calculate p_C
-        dp_C_dt = (dm_c_dt/m_c - dV_c_dt/V_c + dOF_dt*(dT_dOF/T_c + dW_dOF/W_c)) / (1/p_C - dT_dp/T_c + dW_dp/W_c)
+        if m_c > 1e-7:
+            dp_C_dt = (dm_c_dt/m_c - dV_c_dt/V_c + dOF_dt*(dT_dOF/T_c + dW_dOF/W_c)) / (1/p_C - dT_dp/T_c + dW_dp/W_c)
+        else:
+            dp_C_dt = (dm_o_in_dt + dm_f_in_dt) * (R_u / W_c) * T_c / V_c
 
         # assign calculated values to the time derivative state vector
         dx_dt[4] = dr_f_dt
@@ -247,7 +249,7 @@ def ODE_master(cached_data, state_vector, constants_dict):
         # ========== CV3: Nozzle calculations ==========
         # ==============================================
         
-        p_amb = calculate_ambient_pressure(constants_dict, sy_R)
+        p_amb = calculate_air_pressure(constants_dict, sy_R)
         
         # define some helper functions:
         # M_1, the subsonic exit mach when the nozzle throat is choked (required to find p_1)
@@ -378,9 +380,8 @@ def ODE_master(cached_data, state_vector, constants_dict):
         # ==== Compute newest entries to the state vector ====
         # ====================================================    
         
-        print(3)
         update_state_vector(dt, dx_dt, state_vector)
-        print(4)
+        print(state_vector)
 
     return state_vector
 
@@ -388,19 +389,28 @@ def ODE_master(cached_data, state_vector, constants_dict):
 
 # updates the state vector by applying each field in input vector x to the correct place in the state_vector dict
 def update_state_vector(dt, dx_dt, state_vector): 
-    print("updating")      
     # Euler timestep formula: new_x = old_x + dx_dt * dt
     state_vector["time"].append(state_vector["time"][-1] + dt) 
+    # CV1: tank
     state_vector["n_v"].append(state_vector["n_v"][-1] + dx_dt[1] * dt) # n_v = moles of N2O vapor in the tank [mol]
     state_vector["n_l"].append(state_vector["n_l"][-1] + dx_dt[2] * dt) # n_l = moles of N2O liquid in the tank [mol]
     state_vector["T_T"].append(state_vector["T_T"][-1] + dx_dt[3] * dt) # T_T = tank temperature [K]
+    # CV2: combustion chamber
     state_vector["r_f"].append(state_vector["r_f"][-1] + dx_dt[4] * dt) # r_f = fuel cell internal radius [m]
     state_vector["m_o"].append(state_vector["m_o"][-1] + dx_dt[5] * dt) # m_o = oxidizer mass in the combustion chamber [kg]
     state_vector["m_f"].append(state_vector["m_f"][-1] + dx_dt[6] * dt) # m_f = fuel mass in the combustion chamber [kg]
     state_vector["p_C"].append(state_vector["p_C"][-1] + dx_dt[7] * dt) # p_C = combustion chamber pressure [Pa]
-    
-    # need to change
-    state_vector["z_R"].append(state_vector["time"] + dx_dt[8])
-    state_vector["v_R"].append(state_vector["time"] + dx_dt[9])
-    state_vector["a_R"].append(state_vector["time"] + dx_dt[10])
-    # also add: rocket thrust, ...
+    state_vector["OF"].append(state_vector["OF"][-1] + dx_dt[8] * dt) # OF = oxidizer to fuel ratio [x]
+    state_vector["T_C"].append(state_vector["T_C"][-1] + dx_dt[9] * dt) # T_C = combustion chamber temperature [T]
+    # CV3: Nozzle
+    state_vector["F_x"].append(state_vector["F_x"][-1] + dx_dt[10] * dt)
+    state_vector["F_y"].append(state_vector["F_y"][-1] + dx_dt[11] * dt)
+    # CV4: Rocket body
+    state_vector["sy_R"].append(state_vector["sy_R"][-1] + dx_dt[12] * dt)
+    state_vector["sx_R"].append(state_vector["sx_R"][-1] + dx_dt[13] * dt)
+    state_vector["vy_R"].append(state_vector["vy_R"][-1] + dx_dt[14] * dt)
+    state_vector["vx_R"].append(state_vector["vx_R"][-1] + dx_dt[15] * dt)
+    state_vector["ay_R"].append(state_vector["ay_R"][-1] + dx_dt[16] * dt)
+    state_vector["ax_R"].append(state_vector["ax_R"][-1] + dx_dt[17] * dt)
+    state_vector["D_x"].append(state_vector["D_x"][-1] + dx_dt[18] * dt)
+    state_vector["D_y"].append(state_vector["D_y"][-1] + dx_dt[19] * dt)
