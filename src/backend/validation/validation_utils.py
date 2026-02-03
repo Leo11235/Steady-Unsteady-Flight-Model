@@ -140,7 +140,7 @@ def graph_unsteady(unsteady_dic):
     burntime_end = time[burn_idx[-1]]
     burntime = burntime_end - burntime_start
 
-    total_impulse = np.trapz(total_thrust[burn_idx], time[burn_idx])
+    total_impulse = np.trapezoid(total_thrust[burn_idx], time[burn_idx])
 
     plt.figure("thrust")
     plt.plot(time, total_thrust, color="darkgreen", linestyle="dashed", linewidth=1)
