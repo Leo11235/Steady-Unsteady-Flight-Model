@@ -3,7 +3,7 @@ from math import cos
 from math import sin
 from pathlib import Path
 import json5
-from unsteady_variable_initialization import initialize_natural_constants_dict
+import numpy as np
 
 
 _ROOT_DIR = Path(__file__).resolve().parents[3]
@@ -13,10 +13,14 @@ _ROOT_DIR = Path(__file__).resolve().parents[3]
 #     constants_dict = json5.load(f)
 # print(constants_dict)
 
-constants_dict = initialize_natural_constants_dict()
-
 # calculates air density for a given altitude
 def calculate_air_density(constants_dict, height):
+    rho_sl = 1.225 # [kg/m^3]
+    H = 8500 # scale height in [m]
+    return rho_sl * np.exp(-height / H)
+
+# returns ambient pressure at rocket_height
+def calculate_air_pressure(constants_dict, height):
     T0 = constants_dict["sea level temperature"]
     T11 = constants_dict["stratosphere temperature"]
     L = constants_dict["temperature lapse rate in the troposphere"]
@@ -31,10 +35,6 @@ def calculate_air_density(constants_dict, height):
         p_air = p11 * e ** ((11000 - height)*(g*M/(Ru*T11)))
 
     return p_air
-
-# returns ambient pressure at rocket_height
-def calculate_ambient_pressure(constants_dict, rocket_height):
-    return
 
 # calculates post-burn trajectory of the rocket
 def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict):

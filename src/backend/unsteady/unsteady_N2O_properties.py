@@ -98,8 +98,6 @@ def get_N2O_property(property_name, tank_temp, N2O_properties_dict=N2O_propertie
     else:
         # interpolate best match for input tank_temp
         # match will be somewhere between low_index and high_index
-        print(f'matching low index for T = {tank_temp}: {N2O_properties_dict[property_name][low_index_position]};;; diff: {low_index_diff}')
-        print(f'matching high index for T = {tank_temp}: {N2O_properties_dict[property_name][high_index_position]};;; diff: {high_index_diff}')
         return (high_index_diff * N2O_properties_dict[property_name][low_index_position] + low_index_diff * N2O_properties_dict[property_name][high_index_position]) / (high_index_diff + low_index_diff)
 
 

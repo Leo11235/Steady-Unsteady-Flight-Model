@@ -27,10 +27,14 @@ def pyPROPEP_interpolation_lookup(OF, CP, lookup_table=ppp_df_loaded):
     unique_OF = np.sort(lookup_table.index.get_level_values("OF").unique().astype(float))
     unique_CP = np.sort(lookup_table.index.get_level_values("CP").unique().astype(float))
     
-    if OF<1: # bump OF up a tiny bit to make the simulation work
-        OF=1
-        # boundary checks
-    elif OF < unique_OF.min() or OF > unique_OF.max():            
+    ###############
+    ###### clamp to table bounds to prevent crashes at extreme pressures
+    ###############
+    OF = np.clip(OF, unique_OF.min(), unique_OF.max())
+    CP = np.clip(CP, unique_CP.min(), unique_CP.max())
+    
+    # boundary checks
+    if OF < unique_OF.min() or OF > unique_OF.max():            
         raise ValueError(f"OF={OF} is outside the table bounds [{unique_OF.min()}, {unique_OF.max()}]")
     if CP < unique_CP.min() or CP > unique_CP.max():
         raise ValueError(f"CP={CP} is outside the table bounds [{unique_CP.min()}, {unique_CP.max()}]")
