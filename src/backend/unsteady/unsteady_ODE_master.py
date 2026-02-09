@@ -115,8 +115,8 @@ def ODE_master(cached_data, state_vector, constants_dict):
     
     ########################
     # ODE while loop:
-    #while state_vector["vy_R"][-1]>=0 and state_vector["time"][-1] < 1: # ends when velocity is 0 AND more than 1 second has elapsed
-    while state_vector["vy_R"][-1]>=0: # ends when velocity is less than 0
+    #while state_vector["vy_R"][-1]<=0: # ends when velocity is less than 0
+    while state_vector["n_l"][-1]>1: # temp condition for testing until the end of gaseous blowdown
         
         # First: get latest state vector values (only for the necessary items)
         n_v = state_vector["n_v"][-1]
@@ -126,7 +126,7 @@ def ODE_master(cached_data, state_vector, constants_dict):
         m_o = state_vector["m_o"][-1]
         m_f = state_vector["m_f"][-1]
         p_C = state_vector["p_C"][-1]
-        # kinematics only
+        # kinematics 
         sy_R = state_vector["n_v"][-1]
         sx_R = state_vector["n_v"][-1]
         vy_R = state_vector["n_v"][-1]
@@ -135,6 +135,13 @@ def ODE_master(cached_data, state_vector, constants_dict):
         ax_R = state_vector["n_v"][-1]
         D_x = state_vector["n_v"][-1]
         D_y = state_vector["n_v"][-1]
+        
+        
+        # disgusting assumption: if the tank temperature is far below (happens during gaseous blowdown) or above (hasn't happened in simulations), clip it
+        if 185.0>T_T or T_T>305.0:
+            T_T_clamped = np.clip(T_T, 185.0, 300.0)
+            #print(f"clamping T_T from {T_T} to {T_T_clamped}")
+            T_T = T_T_clamped
     
         # ============================================
         # ========== CV1: Tank calculations ==========
@@ -159,7 +166,11 @@ def ODE_master(cached_data, state_vector, constants_dict):
             h_o = get_N2O_property("h_l", T_T) # Oxidizer molar enthalpy (for liquid oxidizer)
 
             # oxidizer molar flow rate (for liquid blowdown only)
-            n_dot = C_i * N_i * A_i * np.sqrt(2*(p_T - p_loss - p_C) / (W_o * v_l))
+            delta_p = p_T - p_loss - p_C # pressure loss differential
+            if delta_p > 0:
+                n_dot = C_i * N_i * A_i * np.sqrt(2*(delta_p) / (W_o * v_l))
+            else: 
+                n_dot = 0.0 # prevents backflow
 
             # set up Av=b system, where dx/dt = [dn_v/dt, dn_l/dt, dT_T/dt]
             A = np.array([
@@ -219,6 +230,7 @@ def ODE_master(cached_data, state_vector, constants_dict):
         # p_C
         # get PROPEP values and PROPEP partial derivatives
         T_c, W_c, gamma, dT_dOF, dW_dOF, dT_dp, dW_dp = get_chamber_properties_with_partials(OF, p_C)
+        dx_dt[9] = T_c
         # chamber gaseous mass storage & its derivative w.r.t. time
         m_c = m_o + m_f
         dm_c_dt = dm_o_in_dt + dm_f_in_dt - dm_n_dt
@@ -228,7 +240,8 @@ def ODE_master(cached_data, state_vector, constants_dict):
             dOF_dt = (1/m_f) * (dm_o_dt - OF * dm_f_dt)
         else:
             dOF_dt = 0  # assume OF is constant (or forced to 1.0) while chamber is empty
-
+        dx_dt[8] = dOF_dt
+        
         # chamber volume & its derivative w.r.t. time
         V_c = V_pre + V_post + np.pi * r_f**2 * L_f
         dV_c_dt = 2* np.pi * r_f * dr_f_dt * L_f
@@ -380,12 +393,10 @@ def ODE_master(cached_data, state_vector, constants_dict):
         # ==== Compute newest entries to the state vector ====
         # ====================================================    
         
+        print(round(state_vector["time"][-1], 4), round(state_vector["n_l"][-1], 4))
         update_state_vector(dt, dx_dt, state_vector)
-        print(state_vector)
 
     return state_vector
-
-
 
 # updates the state vector by applying each field in input vector x to the correct place in the state_vector dict
 def update_state_vector(dt, dx_dt, state_vector): 
@@ -401,7 +412,7 @@ def update_state_vector(dt, dx_dt, state_vector):
     state_vector["m_f"].append(state_vector["m_f"][-1] + dx_dt[6] * dt) # m_f = fuel mass in the combustion chamber [kg]
     state_vector["p_C"].append(state_vector["p_C"][-1] + dx_dt[7] * dt) # p_C = combustion chamber pressure [Pa]
     state_vector["OF"].append(state_vector["OF"][-1] + dx_dt[8] * dt) # OF = oxidizer to fuel ratio [x]
-    state_vector["T_C"].append(state_vector["T_C"][-1] + dx_dt[9] * dt) # T_C = combustion chamber temperature [T]
+    state_vector["T_C"].append(dx_dt[9]) # T_C = combustion chamber temperature [T] /// in this one we calculate & get T_C rather than dT_C_dt
     # CV3: Nozzle
     state_vector["F_x"].append(state_vector["F_x"][-1] + dx_dt[10] * dt)
     state_vector["F_y"].append(state_vector["F_y"][-1] + dx_dt[11] * dt)
@@ -414,3 +425,5 @@ def update_state_vector(dt, dx_dt, state_vector):
     state_vector["ax_R"].append(state_vector["ax_R"][-1] + dx_dt[17] * dt)
     state_vector["D_x"].append(state_vector["D_x"][-1] + dx_dt[18] * dt)
     state_vector["D_y"].append(state_vector["D_y"][-1] + dx_dt[19] * dt)
+
+

@@ -92,9 +92,9 @@ def generate_pyPROPEP_lookup_table(OF_low_end, OF_high_end, OF_step_size,
     
 # example use:
 temp_path = _ROOT_DIR / "Backend" / "PROPEP" / "temp_pypropep_lookup_file.json"
-generate_pyPROPEP_lookup_table(1, 10, 0.1, 
+generate_pyPROPEP_lookup_table(.1, 25, 0.1, 
                                68947.6, # 10 psi lower bound
-                               6894760, # 1000 psi upper bound
+                               68947600, # 1000 psi upper bound
                                68947.6, # 10 psi step size
                                "Pa", # chamber pressure unit type
                                temp_path) # DONT do this, PROPEP becomes nonsensical with OF values below 1

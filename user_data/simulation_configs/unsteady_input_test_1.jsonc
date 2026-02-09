@@ -1,7 +1,7 @@
 {
   "rocket attributes": {
     "rocket name": "Please please pleeeeease work",
-    "timestep length": 0.01, // [s]
+    "timestep length": 0.001, // [s]
 
     // rocket body
     "rocket dry mass": 90, // [kg]
