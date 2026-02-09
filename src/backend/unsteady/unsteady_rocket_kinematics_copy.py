@@ -1,6 +1,7 @@
 from math import e
 from math import cos
 from math import sin
+from math import sqrt
 from pathlib import Path
 import json5
 from unsteady_variable_initialization import initialize_natural_constants_dict, read_input_file
@@ -46,6 +47,7 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict,
     vx_R = state_vector["vx_R"][-1]
     ay_R = state_vector["ay_R"][-1]
     ax_R = state_vector["ax_R"][-1]
+    time = state_vector["time"][-1]
 
     C_d_rocket = rocket_inputs["rocket drag coefficient"]
     A_rocket = rocket_inputs["rocket frontal area"]
@@ -59,9 +61,9 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict,
     # ascent
     while(vy_R >= 0):
         #print(vy_R)
-        new_a_R = (1/m_R)*(force - (1/2)*C_d_rocket*A_rocket*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2) - F_g*cos(theta))
-        new_ay_R = new_a_R * cos(theta)
-        new_ax_R = new_a_R * sin(theta)
+        drag = (1/2)*C_d_rocket*A_rocket*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2)
+        new_ay_R = (1/m_R)*(force*cos(theta) - drag*(vy_R/sqrt(vy_R**2 + vx_R**2)) - F_g)
+        new_ax_R = (1/m_R)*(force*sin(theta) - drag*(vx_R/sqrt(vy_R**2 + vx_R**2)))
 
         new_vy_R = vy_R + ay_R*dt
         new_vx_R = vx_R + ax_R*dt
@@ -75,6 +77,7 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict,
         state_vector["vx_R"].append(new_vx_R)
         state_vector["ay_R"].append(new_ay_R)
         state_vector["ax_R"].append(new_ax_R)
+        state_vector["time"].append(time + dt)
         
         sy_R = state_vector["sy_R"][-1]
         sx_R = state_vector["sx_R"][-1]
@@ -82,12 +85,13 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict,
         vx_R = state_vector["vx_R"][-1]
         ay_R = state_vector["ay_R"][-1]
         ax_R = state_vector["ax_R"][-1]
+        time = state_vector["time"][-1]
 
     # drogue chute descent
     while(vy_R >= H_deployment):
-        new_a_R = (1/m_R)(-F_g + (1/2)*(C_d_rocket*A_rocket + C_d_drogue*A_drogue)*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2))
-        new_ay_R = new_a_R * cos(theta)
-        new_ax_R = new_a_R * sin(theta)
+        drag = (1/2)*(C_d_rocket*A_rocket + C_d_drogue*A_drogue)*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2)
+        new_ay_R = (1/m_R)*(-drag*(vy_R/sqrt(vy_R**2 + vx_R**2)) - F_g)
+        new_ax_R = (1/m_R)*(-drag*(vx_R/sqrt(vy_R**2 + vx_R**2)))
 
         new_vy_R = vy_R + ay_R*dt
         new_vx_R = vx_R + ax_R*dt
@@ -101,6 +105,7 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict,
         state_vector["vx_R"].append(new_vx_R)
         state_vector["ay_R"].append(new_ay_R)
         state_vector["ax_R"].append(new_ax_R)
+        state_vector["time"].append(time + dt)
         
         sy_R = state_vector["sy_R"][-1]
         sx_R = state_vector["sx_R"][-1]
@@ -108,12 +113,13 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict,
         vx_R = state_vector["vx_R"][-1]
         ay_R = state_vector["ay_R"][-1]
         ax_R = state_vector["ax_R"][-1]
+        time = state_vector["time"][-1]
 
     # main chute descent
     while(sy_R > rocket_inputs["launch site altitude"]):
-        new_a_R = (1/m_R)(-F_g + (1/2)*(C_d_rocket*A_rocket + C_d_main*A_main)*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2))
-        new_ay_R = new_a_R * cos(theta)
-        new_ax_R = new_a_R * sin(theta)
+        drag = (1/2)*(C_d_rocket*A_rocket + C_d_main*A_main)*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2)
+        new_ay_R = (1/m_R)*(-drag*(vy_R/sqrt(vy_R**2 + vx_R**2)) - F_g)
+        new_ax_R = (1/m_R)*(-drag*(vx_R/sqrt(vy_R**2 + vx_R**2)))
 
         new_vy_R = vy_R + ay_R*dt
         new_vx_R = vx_R + ax_R*dt
@@ -127,6 +133,7 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict,
         state_vector["vx_R"].append(new_vx_R)
         state_vector["ay_R"].append(new_ay_R)
         state_vector["ax_R"].append(new_ax_R)
+        state_vector["time"].append(time + dt)
         
         sy_R = state_vector["sy_R"][-1]
         sx_R = state_vector["sx_R"][-1]
@@ -134,19 +141,21 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict,
         vx_R = state_vector["vx_R"][-1]
         ay_R = state_vector["ay_R"][-1]
         ax_R = state_vector["ax_R"][-1]
+        time = state_vector["time"][-1]
     return state_vector
 
 
 state_vector_test={
-    "sy_R": [0],
+    "time": [0],
+    "sy_R": [360],
     "sx_R": [0],
-    "vy_R": [100],
+    "vy_R": [1000],
     "vx_R": [10],
     "ay_R": [0],
     "ax_R": [0]
 }
-print("\n\n\n\n")
-print(f'{_ROOT_DIR} / user_data /  simulation_configs / unsteady_input_test_1.jsonc')
+# print("\n\n\n\n")
+# print(f'{_ROOT_DIR} / user_data /  simulation_configs / unsteady_input_test_1.jsonc')
 rocket_inputs_test = {
     "rocket name": "Please please pleeeeease work",
     "timestep length": 0.01, # [s]
@@ -163,5 +172,5 @@ rocket_inputs_test = {
 }
 
 state_vector_test = calculate_flight(state_vector_test, rocket_inputs_test, constants_dict, 0, 1, 0.1)
-plt.plot(state_vector_test["sx_R"], state_vector_test["sy_R"])
+plt.plot(state_vector_test["time"], state_vector_test["sy_R"])
 plt.show()
