@@ -146,3 +146,120 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict,
         ax_R = state_vector["ax_R"][-1]
         time = state_vector["time"][-1]
     return state_vector
+
+def single_ascent_timestep(state_vector:dict, rocket_inputs:dict, constants_dict:dict, force, m_R):
+    dt = rocket_inputs["timestep length"]
+    sy_R = state_vector["sy_R"][-1]
+    sx_R = state_vector["sx_R"][-1]
+    vy_R = state_vector["vy_R"][-1]
+    vx_R = state_vector["vx_R"][-1]
+    ay_R = state_vector["ay_R"][-1]
+    ax_R = state_vector["ax_R"][-1]
+    time = state_vector["time"][-1]
+
+    C_d_rocket = rocket_inputs["rocket drag coefficient"]
+    A_rocket = rocket_inputs["rocket frontal area"]
+    C_d_drogue = rocket_inputs["drogue parachute drag coefficient"]
+    A_drogue = rocket_inputs["drogue parachute frontal area"]
+    H_deployment = rocket_inputs["main parachute deployment altitude"]
+    C_d_main = rocket_inputs["main parachute drag coefficient"]
+    A_main = rocket_inputs["main parachute frontal area"]
+    F_g = constants_dict["sea level gravity"]
+    theta = rocket_inputs["rocket launch angle"]
+
+    drag = (1/2)*C_d_rocket*A_rocket*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2)
+    #drag = 0
+    new_ay_R = (1/m_R)*(force*cos((pi/180)*theta) - drag*(vy_R/sqrt(vy_R**2 + vx_R**2)) - F_g)
+    new_ax_R = (1/m_R)*(force*sin((pi/180)*theta) - drag*(vx_R/sqrt(vy_R**2 + vx_R**2)))
+
+    new_vy_R = vy_R + ay_R*dt
+    new_vx_R = vx_R + ax_R*dt
+
+    new_sy_R = sy_R + vy_R*dt
+    new_sx_R = sx_R + vx_R*dt
+
+    state_vector["sy_R"].append(new_sy_R)
+    state_vector["sx_R"].append(new_sx_R)
+    state_vector["vy_R"].append(new_vy_R)
+    state_vector["vx_R"].append(new_vx_R)
+    state_vector["ay_R"].append(new_ay_R)
+    state_vector["ax_R"].append(new_ax_R)
+    state_vector["time"].append(time + dt)
+    return state_vector
+
+def simulate_descent(state_vector:dict, rocket_inputs:dict, constants_dict:dict, m_R):
+    dt = rocket_inputs["timestep length"]
+    sy_R = state_vector["sy_R"][-1]
+    sx_R = state_vector["sx_R"][-1]
+    vy_R = state_vector["vy_R"][-1]
+    vx_R = state_vector["vx_R"][-1]
+    ay_R = state_vector["ay_R"][-1]
+    ax_R = state_vector["ax_R"][-1]
+    time = state_vector["time"][-1]
+
+    C_d_rocket = rocket_inputs["rocket drag coefficient"]
+    A_rocket = rocket_inputs["rocket frontal area"]
+    C_d_drogue = rocket_inputs["drogue parachute drag coefficient"]
+    A_drogue = rocket_inputs["drogue parachute frontal area"]
+    H_deployment = rocket_inputs["main parachute deployment altitude"]
+    C_d_main = rocket_inputs["main parachute drag coefficient"]
+    A_main = rocket_inputs["main parachute frontal area"]
+    F_g = constants_dict["sea level gravity"]
+    theta = rocket_inputs["rocket launch angle"]
+
+    # drogue chute descent
+    while(sy_R >= H_deployment):
+        drag = (1/2)*(C_d_rocket*A_rocket + C_d_drogue*A_drogue)*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2)
+        new_ay_R = (1/m_R)*(-drag*(vy_R/sqrt(vy_R**2 + vx_R**2)) - F_g)
+        new_ax_R = (1/m_R)*(-drag*(vx_R/sqrt(vy_R**2 + vx_R**2)))
+
+        new_vy_R = vy_R + ay_R*dt
+        new_vx_R = vx_R + ax_R*dt
+
+        new_sy_R = sy_R + vy_R*dt
+        new_sx_R = sx_R + vx_R*dt
+
+        state_vector["sy_R"].append(new_sy_R)
+        state_vector["sx_R"].append(new_sx_R)
+        state_vector["vy_R"].append(new_vy_R)
+        state_vector["vx_R"].append(new_vx_R)
+        state_vector["ay_R"].append(new_ay_R)
+        state_vector["ax_R"].append(new_ax_R)
+        state_vector["time"].append(time + dt)
+        
+        sy_R = state_vector["sy_R"][-1]
+        sx_R = state_vector["sx_R"][-1]
+        vy_R = state_vector["vy_R"][-1]
+        vx_R = state_vector["vx_R"][-1]
+        ay_R = state_vector["ay_R"][-1]
+        ax_R = state_vector["ax_R"][-1]
+        time = state_vector["time"][-1]
+
+    # main chute descent
+    while(sy_R > rocket_inputs["launch site altitude"]):
+        drag = (1/2)*(C_d_rocket*A_rocket + C_d_main*A_main)*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2)
+        new_ay_R = (1/m_R)*(-drag*(vy_R/sqrt(vy_R**2 + vx_R**2)) - F_g)
+        new_ax_R = (1/m_R)*(-drag*(vx_R/sqrt(vy_R**2 + vx_R**2)))
+
+        new_vy_R = vy_R + ay_R*dt
+        new_vx_R = vx_R + ax_R*dt
+
+        new_sy_R = sy_R + vy_R*dt
+        new_sx_R = sx_R + vx_R*dt
+
+        state_vector["sy_R"].append(new_sy_R)
+        state_vector["sx_R"].append(new_sx_R)
+        state_vector["vy_R"].append(new_vy_R)
+        state_vector["vx_R"].append(new_vx_R)
+        state_vector["ay_R"].append(new_ay_R)
+        state_vector["ax_R"].append(new_ax_R)
+        state_vector["time"].append(time + dt)
+        
+        sy_R = state_vector["sy_R"][-1]
+        sx_R = state_vector["sx_R"][-1]
+        vy_R = state_vector["vy_R"][-1]
+        vx_R = state_vector["vx_R"][-1]
+        ay_R = state_vector["ay_R"][-1]
+        ax_R = state_vector["ax_R"][-1]
+        time = state_vector["time"][-1]
+    return state_vector
