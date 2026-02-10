@@ -2,6 +2,7 @@ from math import e
 from math import cos
 from math import sin
 from math import sqrt
+from math import pi
 from pathlib import Path
 import json5
 import numpy as np
@@ -39,7 +40,7 @@ def calculate_air_pressure(constants_dict, height):
     return p_air
 
 # calculates post-burn trajectory of the rocket
-def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict, force, m_R, theta):
+def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict, force, m_R):
     dt = rocket_inputs["timestep length"]
     sy_R = state_vector["sy_R"][-1]
     sx_R = state_vector["sx_R"][-1]
@@ -57,14 +58,15 @@ def calculate_flight(state_vector:dict, rocket_inputs:dict, constants_dict:dict,
     C_d_main = rocket_inputs["main parachute drag coefficient"]
     A_main = rocket_inputs["main parachute frontal area"]
     F_g = constants_dict["sea level gravity"]
+    theta = rocket_inputs["rocket launch angle"]
 
     # ascent
     while(vy_R >= 0):
         #print(vy_R)
         drag = (1/2)*C_d_rocket*A_rocket*calculate_air_density(constants_dict, sy_R)*(vy_R**2 + vx_R**2)
         #drag = 0
-        new_ay_R = (1/m_R)*(force*cos(theta) - drag*(vy_R/sqrt(vy_R**2 + vx_R**2)) - F_g)
-        new_ax_R = (1/m_R)*(force*sin(theta) - drag*(vx_R/sqrt(vy_R**2 + vx_R**2)))
+        new_ay_R = (1/m_R)*(force*cos((pi/180)*theta) - drag*(vy_R/sqrt(vy_R**2 + vx_R**2)) - F_g)
+        new_ax_R = (1/m_R)*(force*sin((pi/180)*theta) - drag*(vx_R/sqrt(vy_R**2 + vx_R**2)))
 
         new_vy_R = vy_R + ay_R*dt
         new_vx_R = vx_R + ax_R*dt
